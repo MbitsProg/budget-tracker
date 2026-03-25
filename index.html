@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
-  <title>Smart Ledger Pro | Budget + Annual Income Tracker</title>
+  <title>Smart Ledger Pro | Budget + Annual + Investments</title>
   <style>
     * {
       margin: 0;
@@ -43,6 +43,7 @@
       gap: 8px;
       margin-bottom: 28px;
       border-bottom: 2px solid #cbdde6;
+      flex-wrap: wrap;
     }
     .tab-btn {
       background: none;
@@ -67,7 +68,7 @@
     .tab-content.active {
       display: block;
     }
-    /* Dashboard cards (modified) */
+    /* Dashboard cards */
     .dashboard {
       display: flex;
       flex-wrap: wrap;
@@ -129,14 +130,19 @@
       font-weight: 600;
       color: #2c4c6e;
     }
-    .input-field input {
+    .input-field input, .input-field textarea {
       padding: 10px 12px;
       border: 1px solid #cbdde6;
       border-radius: 20px;
       font-size: 0.9rem;
       background: #fefefe;
+      font-family: inherit;
     }
-    .input-field input:focus {
+    .input-field textarea {
+      resize: vertical;
+      min-height: 70px;
+    }
+    .input-field input:focus, .input-field textarea:focus {
       outline: none;
       border-color: #2c7da0;
       box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
@@ -198,20 +204,20 @@
       background: white;
       border: 1px solid #e2edf2;
     }
-    .entries-table {
+    .entries-table, .investments-table {
       width: 100%;
       border-collapse: collapse;
       font-size: 0.8rem;
-      min-width: 1000px;
+      min-width: 800px;
     }
-    .entries-table th, .annual-table th {
+    .entries-table th, .investments-table th, .annual-table th {
       text-align: left;
       padding: 14px 10px;
       background: #f0f6fa;
       font-weight: 600;
       color: #2b5d7c;
     }
-    .entries-table td, .annual-table td {
+    .entries-table td, .investments-table td, .annual-table td {
       padding: 12px 10px;
       border-top: 1px solid #e6edf2;
     }
@@ -240,12 +246,13 @@
 <body>
 <div class="container">
   <h1>💰 Smart Ledger Pro</h1>
-  <div class="sub">Budget tracker + Annual income history</div>
+  <div class="sub">Budget tracker + Annual income + Investments</div>
 
   <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="budget">📊 Budget Tracker</button>
     <button class="tab-btn" data-tab="annual">📅 Annual Income</button>
+    <button class="tab-btn" data-tab="investments">📈 Investments</button>
   </div>
 
   <!-- BUDGET TRACKER TAB -->
@@ -253,11 +260,11 @@
     <!-- INTERNET REMINDER -->
     <div id="internetReminder" class="reminder-card" style="display: none;"></div>
 
-    <!-- KPI CARDS (without BDO total) -->
+    <!-- KPI CARDS (Total Tights instead of Net Surplus) -->
     <div class="dashboard">
       <div class="card-summary"><h3>📆 This Year Savings (Vybe)</h3><div class="amount" id="yearlySavings">₱0</div></div>
       <div class="card-summary"><h3>🏦 Total MP2 (Maya)</h3><div class="amount" id="totalMP2">₱0</div></div>
-      <div class="card-summary"><h3>📊 Net Surplus (All time)</h3><div class="amount" id="totalSurplus">₱0</div></div>
+      <div class="card-summary"><h3>🧦 Total Tights</h3><div class="amount" id="totalTights">₱0</div></div>
     </div>
 
     <!-- FIXED INCOME (Editable) -->
@@ -363,7 +370,7 @@
               <th>Net Income</th>
               <th>Monthly Net Average</th>
               <th>Actions</th>
-             </tr>
+            </tr>
           </thead>
           <tbody id="annualBody">
             <!-- dynamic rows -->
@@ -376,15 +383,62 @@
     </div>
   </div>
 
+  <!-- INVESTMENTS TAB -->
+  <div id="investmentsTab" class="tab-content">
+    <div class="panel" id="investmentFormPanel">
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <h3 style="font-weight: 600;">📈 Add / Edit Investment</h3>
+        <span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px; font-size:0.7rem;">New investment</span>
+      </div>
+      <input type="hidden" id="editInvId" value="">
+      <div class="form-grid">
+        <div class="input-field"><label>Investment Title *</label><input type="text" id="invTitle" placeholder="e.g., Stock Portfolio"></div>
+        <div class="input-field"><label>Description</label><textarea id="invDesc" rows="2" placeholder="Additional details..."></textarea></div>
+        <div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div>
+        <div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div>
+        <div class="input-field"><label>Maintenance (annual, ₱)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div>
+      </div>
+      <div class="badge-info">💡 Profit can be negative (loss). Maintenance is any recurring annual fee.</div>
+      <div class="action-buttons">
+        <button id="cancelInvEditBtn" style="display: none;">Cancel edit</button>
+        <button id="submitInvBtn" class="primary">➕ Add Investment</button>
+      </div>
+    </div>
+
+    <div class="entries-header" style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 12px;">
+      <h2>📊 Investment Portfolio</h2>
+      <button id="resetInvestmentsBtn" class="danger" style="background:#ffe6e5;">🗑️ Reset all investments</button>
+    </div>
+    <div class="table-wrapper">
+      <table class="investments-table">
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Total Invested</th>
+            <th>Total Profit</th>
+            <th>Maintenance (annual)</th>
+            <th>Net ROI</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody id="investmentsBody">
+          <tr><td colspan="7" style="text-align:center; padding:32px;">No investments yet. Add your first one.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
   <footer>📌 Internet bill reminder: ₱10,000/year due June 15. Reminder appears on May 30. All data saved locally.</footer>
 </div>
 
 <script>
-  // ==================== GLOBAL STORAGE KEYS ====================
-  const ENTRIES_KEY = 'smartLedgerPro_entries_v4';
-  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v4';
-  const INTERNET_PAID_KEY = 'internetPaidYears_v4';
-  const ANNUAL_KEY = 'annualIncomeData_v2';
+  // ==================== STORAGE KEYS ====================
+  const ENTRIES_KEY = 'smartLedgerPro_entries_v5';
+  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v5';
+  const INTERNET_PAID_KEY = 'internetPaidYears_v5';
+  const ANNUAL_KEY = 'annualIncomeData_v3';
+  const INVESTMENTS_KEY = 'investmentsData_v1';
 
   // ==================== ANNUAL INCOME DATA ====================
   let annualData = [];
@@ -397,7 +451,6 @@
       } catch(e) { annualData = []; }
     }
     if (!annualData.length) {
-      // Initial data for 2023-2025
       annualData = [
         { year: 2023, grossComp: 1086933.99, nonTaxable: 155433.74, taxable: 931500.25, taxDue: 135372.56, netIncome: 951561.43, monthlyNetAvg: 79296.79 },
         { year: 2024, grossComp: 1472313.48, nonTaxable: 177579.04, taxable: 1294734.44, taxDue: 226183.61, netIncome: 1246129.87, monthlyNetAvg: 103844.16 },
@@ -419,7 +472,7 @@
     }
     const sorted = [...annualData].sort((a,b) => a.year - b.year);
     tbody.innerHTML = '';
-    sorted.forEach((record, idx) => {
+    sorted.forEach((record) => {
       const row = tbody.insertRow();
       row.insertCell(0).innerText = record.year;
       row.insertCell(1).innerHTML = `<input type="number" step="0.01" class="annual-input" data-year="${record.year}" data-field="grossComp" value="${record.grossComp}" style="width:120px; padding:6px; border-radius:12px; border:1px solid #cbdde6;">`;
@@ -431,7 +484,6 @@
       const actionCell = row.insertCell(7);
       actionCell.innerHTML = `<button class="delete-year-btn" data-year="${record.year}" style="background:#ffe6e5; padding:4px 12px; border-radius:30px;">🗑️ Delete</button>`;
     });
-    // attach change listeners to inputs
     document.querySelectorAll('.annual-input').forEach(input => {
       input.addEventListener('change', (e) => {
         const year = parseInt(input.getAttribute('data-year'));
@@ -472,7 +524,7 @@
     renderAnnualTable();
   }
 
-  // ==================== BUDGET TRACKER CODE ====================
+  // ==================== BUDGET TRACKER ====================
   let fixedIncome = { basic: 36000, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
   let entries = [];
 
@@ -555,10 +607,7 @@
     return getGrossIncome() - computeDeductions(entry);
   }
 
-  function computeBDOTransfer(entry) {
-    return (entry.amortization || 0) + (entry.carFixed || 0);
-  }
-
+  function computeBDOTransfer(entry) { return (entry.amortization || 0) + (entry.carFixed || 0); }
   function computeMP2(entry) { return entry.mp2Amount || 0; }
   function computeSavings(entry) { return entry.savingsAmount || 0; }
 
@@ -581,18 +630,21 @@
     return remainingBefore - computeTights(entry);
   }
 
+  function getTotalTights() {
+    return entries.reduce((sum, e) => sum + computeTights(e), 0);
+  }
+
   function getYearlySavings() {
     const currentYear = new Date().getFullYear();
     return entries.reduce((sum, e) => sum + (new Date(e.date).getFullYear() === currentYear ? computeSavings(e) : 0), 0);
   }
 
   function getTotalMP2() { return entries.reduce((sum, e) => sum + computeMP2(e), 0); }
-  function getTotalSurplus() { return entries.reduce((sum, e) => sum + computeFinalRemaining(e), 0); }
 
   function renderBudgetDashboard() {
     document.getElementById('yearlySavings').innerHTML = '₱' + getYearlySavings().toLocaleString(2);
     document.getElementById('totalMP2').innerHTML = '₱' + getTotalMP2().toLocaleString(2);
-    document.getElementById('totalSurplus').innerHTML = '₱' + getTotalSurplus().toLocaleString(2);
+    document.getElementById('totalTights').innerHTML = '₱' + getTotalTights().toLocaleString(2);
   }
 
   function renderEntriesTable() {
@@ -651,6 +703,207 @@
     });
   }
 
+  function loadEntryForEdit(id) { /* same as before */ }
+  function clearForm() { /* same as before */ }
+  function getFormData() { /* same as before */ }
+  function submitEntry() { /* same as before */ }
+  function resetAllData() { /* same as before */ }
+
+  // Internet reminder (unchanged)
+  function getPaidYears() {
+    const stored = localStorage.getItem(INTERNET_PAID_KEY);
+    return stored ? JSON.parse(stored) : [];
+  }
+  function markInternetPaid(year) {
+    let paid = getPaidYears();
+    if (!paid.includes(year)) paid.push(year);
+    localStorage.setItem(INTERNET_PAID_KEY, JSON.stringify(paid));
+    updateInternetReminder();
+  }
+  function isInternetPaidForYear(year) { return getPaidYears().includes(year); }
+  function updateInternetReminder() {
+    const reminderDiv = document.getElementById('internetReminder');
+    const today = new Date();
+    const year = today.getFullYear();
+    if (year > 2026) { reminderDiv.style.display = 'none'; return; }
+    if (isInternetPaidForYear(year)) { reminderDiv.style.display = 'none'; return; }
+    const dueDate = new Date(year, 5, 15);
+    const reminderDate = new Date(year, 4, 30);
+    if (today >= reminderDate && today <= dueDate) {
+      reminderDiv.style.display = 'flex';
+      reminderDiv.innerHTML = `<div><strong>🌐 Internet Bill Reminder</strong><br>₱10,000 annual payment due June 15, ${year}.</div>
+                              <button id="markInternetPaidBtn" class="primary" style="background:#2c7da0;">✅ Mark as Paid</button>`;
+      document.getElementById('markInternetPaidBtn')?.addEventListener('click', () => { markInternetPaid(year); updateInternetReminder(); });
+    } else { reminderDiv.style.display = 'none'; }
+  }
+
+  function renderAllBudget() {
+    renderEntriesTable();
+    updateInternetReminder();
+  }
+
+  // ==================== INVESTMENTS ====================
+  let investments = [];
+
+  function loadInvestments() {
+    const stored = localStorage.getItem(INVESTMENTS_KEY);
+    if (stored) {
+      try {
+        investments = JSON.parse(stored);
+      } catch(e) { investments = []; }
+    } else {
+      // demo data
+      investments = [
+        { id: Date.now(), title: "Stock Market", description: "Blue chip stocks", totalInvested: 50000, totalProfit: 3500, maintenance: 1200 },
+        { id: Date.now()+1, title: "Cryptocurrency", description: "BTC/ETH", totalInvested: 30000, totalProfit: -5000, maintenance: 0 }
+      ];
+      saveInvestments();
+    }
+  }
+
+  function saveInvestments() {
+    localStorage.setItem(INVESTMENTS_KEY, JSON.stringify(investments));
+  }
+
+  function renderInvestmentsTable() {
+    const tbody = document.getElementById('investmentsBody');
+    if (!investments.length) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center; padding:32px;">No investments yet. Add your first one.</td></tr>';
+      return;
+    }
+    const sorted = [...investments].sort((a,b) => a.title.localeCompare(b.title));
+    tbody.innerHTML = '';
+    sorted.forEach(inv => {
+      const netROI = inv.totalProfit - inv.maintenance; // simple net after maintenance
+      const row = tbody.insertRow();
+      row.insertCell(0).innerText = inv.title;
+      row.insertCell(1).innerText = inv.description || '-';
+      row.insertCell(2).innerHTML = `₱${inv.totalInvested.toLocaleString(2)}`;
+      row.insertCell(3).innerHTML = `₱${inv.totalProfit.toLocaleString(2)}`;
+      row.insertCell(4).innerHTML = `₱${inv.maintenance.toLocaleString(2)}`;
+      row.insertCell(5).innerHTML = `₱${netROI.toLocaleString(2)}`;
+      const actionCell = row.insertCell(6);
+      actionCell.innerHTML = `<button class="edit-inv-btn" data-id="${inv.id}">✏️ Edit</button>
+                              <button class="delete-inv-btn" data-id="${inv.id}">🗑️ Del</button>`;
+    });
+    document.querySelectorAll('.edit-inv-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.getAttribute('data-id'));
+        loadInvestmentForEdit(id);
+      });
+    });
+    document.querySelectorAll('.delete-inv-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const id = parseInt(btn.getAttribute('data-id'));
+        if (confirm('Delete this investment?')) {
+          investments = investments.filter(i => i.id !== id);
+          saveInvestments();
+          renderInvestmentsTable();
+          clearInvestmentForm();
+        }
+      });
+    });
+  }
+
+  function loadInvestmentForEdit(id) {
+    const inv = investments.find(i => i.id === id);
+    if (!inv) return;
+    document.getElementById('editInvId').value = inv.id;
+    document.getElementById('invTitle').value = inv.title;
+    document.getElementById('invDesc').value = inv.description || '';
+    document.getElementById('invInvested').value = inv.totalInvested;
+    document.getElementById('invProfit').value = inv.totalProfit;
+    document.getElementById('invMaintenance').value = inv.maintenance;
+    document.getElementById('invFormModeBadge').innerHTML = '✏️ Editing';
+    document.getElementById('submitInvBtn').innerText = '✏️ Update Investment';
+    document.getElementById('cancelInvEditBtn').style.display = 'inline-block';
+    document.getElementById('investmentFormPanel').scrollIntoView({ behavior: 'smooth' });
+  }
+
+  function clearInvestmentForm() {
+    document.getElementById('editInvId').value = '';
+    document.getElementById('invTitle').value = '';
+    document.getElementById('invDesc').value = '';
+    document.getElementById('invInvested').value = 0;
+    document.getElementById('invProfit').value = 0;
+    document.getElementById('invMaintenance').value = 0;
+    document.getElementById('invFormModeBadge').innerHTML = 'New investment';
+    document.getElementById('submitInvBtn').innerText = '➕ Add Investment';
+    document.getElementById('cancelInvEditBtn').style.display = 'none';
+  }
+
+  function submitInvestment() {
+    const title = document.getElementById('invTitle').value.trim();
+    if (!title) { alert('Please enter an investment title.'); return; }
+    const description = document.getElementById('invDesc').value;
+    const totalInvested = parseFloat(document.getElementById('invInvested').value) || 0;
+    const totalProfit = parseFloat(document.getElementById('invProfit').value) || 0;
+    const maintenance = parseFloat(document.getElementById('invMaintenance').value) || 0;
+    const editId = document.getElementById('editInvId').value;
+    if (editId) {
+      const index = investments.findIndex(i => i.id == editId);
+      if (index !== -1) {
+        investments[index] = { ...investments[index], title, description, totalInvested, totalProfit, maintenance };
+        saveInvestments();
+        renderInvestmentsTable();
+        clearInvestmentForm();
+      }
+    } else {
+      const newId = Date.now();
+      investments.push({ id: newId, title, description, totalInvested, totalProfit, maintenance });
+      saveInvestments();
+      renderInvestmentsTable();
+      clearInvestmentForm();
+    }
+  }
+
+  function resetInvestments() {
+    if (confirm('⚠️ Delete ALL investments? This cannot be undone.')) {
+      investments = [];
+      saveInvestments();
+      renderInvestmentsTable();
+      clearInvestmentForm();
+    }
+  }
+
+  // ==================== TAB SWITCHING ====================
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+    document.getElementById(tabId + 'Tab').classList.add('active');
+    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
+    if (tabId === 'annual') renderAnnualTable();
+    if (tabId === 'investments') renderInvestmentsTable();
+  }
+
+  // ==================== INIT ====================
+  document.addEventListener('DOMContentLoaded', () => {
+    loadFixedSettings();
+    loadEntries();
+    renderAllBudget();
+    loadAnnualData();
+    renderAnnualTable();
+    loadInvestments();
+    renderInvestmentsTable();
+
+    document.getElementById('saveFixedBtn').addEventListener('click', saveFixedSettings);
+    document.getElementById('submitEntryBtn').addEventListener('click', submitEntry);
+    document.getElementById('cancelEditBtn').addEventListener('click', clearForm);
+    document.getElementById('resetAllBtn').addEventListener('click', resetAllData);
+    document.getElementById('addYearBtn').addEventListener('click', addNewYear);
+    document.getElementById('submitInvBtn').addEventListener('click', submitInvestment);
+    document.getElementById('cancelInvEditBtn').addEventListener('click', clearInvestmentForm);
+    document.getElementById('resetInvestmentsBtn').addEventListener('click', resetInvestments);
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
+    });
+    if (!document.getElementById('entryDate').value) document.getElementById('entryDate').value = new Date().toISOString().slice(0,10);
+    updateSavingsDefault();
+    document.getElementById('fixedBasic').addEventListener('input', () => updateSavingsDefault());
+  });
+
+  // dummy implementations for missing budget functions (they are defined later in the script but we need them in scope)
   function loadEntryForEdit(id) {
     const entry = entries.find(e => e.id === id);
     if (!entry) return;
@@ -748,70 +1001,6 @@
       clearForm();
     }
   }
-
-  // Internet reminder
-  function getPaidYears() {
-    const stored = localStorage.getItem(INTERNET_PAID_KEY);
-    return stored ? JSON.parse(stored) : [];
-  }
-  function markInternetPaid(year) {
-    let paid = getPaidYears();
-    if (!paid.includes(year)) paid.push(year);
-    localStorage.setItem(INTERNET_PAID_KEY, JSON.stringify(paid));
-    updateInternetReminder();
-  }
-  function isInternetPaidForYear(year) { return getPaidYears().includes(year); }
-  function updateInternetReminder() {
-    const reminderDiv = document.getElementById('internetReminder');
-    const today = new Date();
-    const year = today.getFullYear();
-    if (year > 2026) { reminderDiv.style.display = 'none'; return; }
-    if (isInternetPaidForYear(year)) { reminderDiv.style.display = 'none'; return; }
-    const dueDate = new Date(year, 5, 15);
-    const reminderDate = new Date(year, 4, 30);
-    if (today >= reminderDate && today <= dueDate) {
-      reminderDiv.style.display = 'flex';
-      reminderDiv.innerHTML = `<div><strong>🌐 Internet Bill Reminder</strong><br>₱10,000 annual payment due June 15, ${year}.</div>
-                              <button id="markInternetPaidBtn" class="primary" style="background:#2c7da0;">✅ Mark as Paid</button>`;
-      document.getElementById('markInternetPaidBtn')?.addEventListener('click', () => { markInternetPaid(year); updateInternetReminder(); });
-    } else { reminderDiv.style.display = 'none'; }
-  }
-
-  function renderAllBudget() {
-    renderEntriesTable();
-    updateInternetReminder();
-  }
-
-  // ==================== TAB SWITCHING ====================
-  function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.getElementById(tabId + 'Tab').classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
-    if (tabId === 'annual') renderAnnualTable();
-  }
-
-  // ==================== INIT ====================
-  document.addEventListener('DOMContentLoaded', () => {
-    loadFixedSettings();
-    loadEntries();
-    renderAllBudget();
-    loadAnnualData();
-    renderAnnualTable();
-
-    document.getElementById('saveFixedBtn').addEventListener('click', saveFixedSettings);
-    document.getElementById('submitEntryBtn').addEventListener('click', submitEntry);
-    document.getElementById('cancelEditBtn').addEventListener('click', clearForm);
-    document.getElementById('resetAllBtn').addEventListener('click', resetAllData);
-    document.getElementById('addYearBtn').addEventListener('click', addNewYear);
-
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-      btn.addEventListener('click', () => switchTab(btn.getAttribute('data-tab')));
-    });
-    if (!document.getElementById('entryDate').value) document.getElementById('entryDate').value = new Date().toISOString().slice(0,10);
-    updateSavingsDefault();
-    document.getElementById('fixedBasic').addEventListener('input', () => updateSavingsDefault());
-  });
 </script>
 </body>
 </html>
