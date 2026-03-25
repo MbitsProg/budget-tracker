@@ -202,7 +202,7 @@
       width: 100%;
       border-collapse: collapse;
       font-size: 0.8rem;
-      min-width: 900px;
+      min-width: 1000px;
     }
     .entries-table th, .annual-table th {
       text-align: left;
@@ -327,10 +327,21 @@
     <div class="table-wrapper">
       <table class="entries-table">
         <thead>
-          <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay (Used)</th><th>BDO Transfer</th><th>Maya (MP2)</th><th>Vybe (Savings)</th><th>Tights (10% Remaining)</th><th>Actions</th></tr>
+          <tr>
+            <th>Date</th>
+            <th>Gross Income</th>
+            <th>Deductions</th>
+            <th>Net Pay (Used)</th>
+            <th>BDO Transfer</th>
+            <th>Maya (MP2)</th>
+            <th>Vybe (Savings)</th>
+            <th>Tights (10%)</th>
+            <th>Net Surplus</th>
+            <th>Actions</th>
+           </tr>
         </thead>
         <tbody id="entriesBody">
-          <tr><td colspan="9" style="text-align:center; padding:32px;">No records yet. Add your first payday. </td></tr>
+          <tr><td colspan="10" style="text-align:center; padding:32px;">No records yet. Add your first payday. </td></tr>
         </tbody>
       </table>
     </div>
@@ -341,7 +352,7 @@
     <div class="panel">
       <div class="section-title">📅 Annual Income Summary</div>
       <div class="table-wrapper">
-        <table class="annual-table" id="annualTable" style="width:100%">
+        <table class="annual-table" style="width:100%">
           <thead>
             <tr>
               <th>Year</th>
@@ -352,7 +363,7 @@
               <th>Net Income</th>
               <th>Monthly Net Average</th>
               <th>Actions</th>
-            </tr>
+             </tr>
           </thead>
           <tbody id="annualBody">
             <!-- dynamic rows -->
@@ -370,10 +381,10 @@
 
 <script>
   // ==================== GLOBAL STORAGE KEYS ====================
-  const ENTRIES_KEY = 'smartLedgerPro_entries_v3';
-  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v3';
-  const INTERNET_PAID_KEY = 'internetPaidYears_v3';
-  const ANNUAL_KEY = 'annualIncomeData_v1';
+  const ENTRIES_KEY = 'smartLedgerPro_entries_v4';
+  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v4';
+  const INTERNET_PAID_KEY = 'internetPaidYears_v4';
+  const ANNUAL_KEY = 'annualIncomeData_v2';
 
   // ==================== ANNUAL INCOME DATA ====================
   let annualData = [];
@@ -587,7 +598,7 @@
   function renderEntriesTable() {
     const tbody = document.getElementById('entriesBody');
     if (!entries.length) {
-      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center; padding:32px;">No records. Add payday ➕</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" style="text-align:center; padding:32px;">No records. Add payday ➕</td></tr>';
       renderBudgetDashboard();
       return;
     }
@@ -601,6 +612,7 @@
       const mp2 = computeMP2(entry);
       const savings = computeSavings(entry);
       const tights = computeTights(entry);
+      const surplus = computeFinalRemaining(entry);
       const row = tbody.insertRow();
       row.insertCell(0).innerText = entry.date;
       row.insertCell(1).innerHTML = `₱${gross.toLocaleString(2)}`;
@@ -610,7 +622,8 @@
       row.insertCell(5).innerHTML = `₱${mp2.toLocaleString(2)}`;
       row.insertCell(6).innerHTML = `₱${savings.toLocaleString(2)}`;
       row.insertCell(7).innerHTML = `₱${tights.toLocaleString(2)}`;
-      const actionCell = row.insertCell(8);
+      row.insertCell(8).innerHTML = `₱${surplus.toLocaleString(2)}`;
+      const actionCell = row.insertCell(9);
       actionCell.innerHTML = `<button class="edit-btn" data-id="${entry.id}">✏️ Edit</button>
                               <button class="delete-btn" data-id="${entry.id}">🗑️ Del</button>`;
     });
@@ -736,7 +749,7 @@
     }
   }
 
-  // Internet reminder (unchanged)
+  // Internet reminder
   function getPaidYears() {
     const stored = localStorage.getItem(INTERNET_PAID_KEY);
     return stored ? JSON.parse(stored) : [];
