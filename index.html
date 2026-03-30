@@ -148,34 +148,34 @@
       <table class="entries-table">
         <thead>
           <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>BDO Transfer</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th> </thead>
-        <tbody id="entriesBody">发展<td colspan="10">No records. Add a manual entry or import Excel.发展</tbody>
-       </table>
+        <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
+        </table>
     </div>
   </div>
 
-  <!-- ANNUAL INCOME TAB (unchanged) -->
-  <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead> <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr> </thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+  <!-- ANNUAL INCOME TAB -->
+  <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead> <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th> </thead><tbody id="annualBody"></tbody> </table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
 
-  <!-- INVESTMENTS TAB (unchanged) -->
-  <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2><button id="resetInvestmentsBtn" class="danger">Reset all investments</button></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead><tbody id="investmentsBody"></tbody></table></div></div>
+  <!-- INVESTMENTS TAB -->
+  <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2><button id="resetInvestmentsBtn" class="danger">Reset all investments</button></div><div class="table-wrapper"><table class="investments-table"><thead> <tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th> </thead><tbody id="investmentsBody"></tbody> </table></div></div>
 
   <footer>📌 Internet bill reminder: ₱10,000/year due June 15. Reminder appears on May 30. All data saved locally. Excel import uses SheetJS.</footer>
 </div>
 
 <script>
   // ==================== STORAGE KEYS ====================
-  const ENTRIES_KEY = 'smartLedgerPro_entries_v8';
-  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v8';
-  const INTERNET_PAID_KEY = 'internetPaidYears_v8';
-  const ANNUAL_KEY = 'annualIncomeData_v6';
-  const INVESTMENTS_KEY = 'investmentsData_v4';
+  const ENTRIES_KEY = 'smartLedgerPro_entries_v9';
+  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v9';
+  const INTERNET_PAID_KEY = 'internetPaidYears_v9';
+  const ANNUAL_KEY = 'annualIncomeData_v7';
+  const INVESTMENTS_KEY = 'investmentsData_v5';
 
   let fixedIncome = { basic: 37260, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
   let entries = [];
   let annualData = [];
   let investments = [];
 
-  // ==================== ANNUAL (unchanged) ====================
+  // ==================== ANNUAL ====================
   function loadAnnualData() {
     const stored = localStorage.getItem(ANNUAL_KEY);
     if (stored) annualData = JSON.parse(stored);
@@ -219,7 +219,7 @@
   }
   function addNewYear() { const maxYear = Math.max(...annualData.map(r=>r.year),2025); annualData.push({ year: maxYear+1, grossComp:0, nonTaxable:0, taxable:0, taxDue:0, netIncome:0, monthlyNetAvg:0 }); saveAnnualData(); renderAnnualTable(); }
 
-  // ==================== BUDGET TRACKER ====================
+  // ==================== BUDGET ====================
   function loadFixedSettings() {
     const stored = localStorage.getItem(FIXED_KEY);
     if (stored) fixedIncome = { ...fixedIncome, ...JSON.parse(stored) };
@@ -263,13 +263,7 @@
   }
   function saveEntries() { localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries)); }
 
-  // Helper: get the actual net pay for an entry (used for allocations)
-  function getEntryNetPay(entry) {
-    if (entry.netPay !== undefined) return entry.netPay;
-    // fallback for old entries (should not happen)
-    return (entry.actualNetPay && entry.actualNetPay>0) ? entry.actualNetPay : 0;
-  }
-
+  function getEntryNetPay(entry) { return entry.netPay !== undefined ? entry.netPay : 0; }
   function computeEntrySavings(entry) { return entry.savingsAmount || 0; }
   function computeEntryBDO(e) { return (e.amortization||0)+(e.carFixed||0); }
   function computeEntryMP2(e) { return e.mp2Amount||0; }
@@ -299,13 +293,12 @@
 
   function renderEntriesTable() {
     const tbody = document.getElementById('entriesBody');
-    if (!entries.length) { tbody.innerHTML='<tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr>'; renderBudgetDashboard(); return; }
+    if (!entries.length) { tbody.innerHTML = '<tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr>'; renderBudgetDashboard(); return; }
     const sorted = [...entries].sort((a,b)=>new Date(b.date)-new Date(a.date));
     tbody.innerHTML = '';
     sorted.forEach(e => {
       const row = tbody.insertRow();
       row.insertCell(0).innerText = e.date;
-      // Gross Income = Net Pay + Deductions (if deductions exist)
       const gross = getEntryNetPay(e) + (e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0);
       row.insertCell(1).innerHTML = '₱'+gross.toLocaleString(2);
       const deductions = (e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0);
@@ -393,7 +386,6 @@
     const data = getFormData();
     if(!data.date){alert('Select date');return;}
     if(data.netPay<=0){alert('Please enter a valid Net Pay amount.');return;}
-    // Round savings to nearest hundred if not manually set
     if (data.savingsAmount === undefined || isNaN(data.savingsAmount) || data.savingsAmount===0) {
       data.savingsAmount = Math.round((data.netPay * 0.15) / 100) * 100;
     }
@@ -411,7 +403,7 @@
   }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){entries=[];saveEntries();renderEntriesTable();clearForm();} }
 
-  // ==================== EXCEL IMPORT (fixed) ====================
+  // ==================== EXCEL IMPORT ====================
   async function parseExcelToEntries(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -445,12 +437,10 @@
           let formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
           let takeHome = parseFloat(row[idxTakeHome]) || 0;
           if(takeHome===0) continue;
-          // Read deductions if present, otherwise default 0
           let mpf = parseFloat(row[idxMPF]) || 0;
           let phil = parseFloat(row[idxPhil]) || 0;
           let hdmf = parseFloat(row[idxHDMF]) || 0;
           let sss = parseFloat(row[idxSSS]) || 0;
-          // Round savings to nearest hundred based on take-home
           let savings = Math.round((takeHome * 0.15) / 100) * 100;
           let newEntry = {
             id: Date.now() + i + Math.random(),
