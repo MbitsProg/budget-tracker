@@ -18,7 +18,6 @@
       padding: 20px 16px 48px;
       color: #1a2c3e;
     }
-    /* Dark mode styles */
     body.dark-mode {
       background: #121826;
       color: #e2e8f0;
@@ -26,7 +25,6 @@
     body.dark-mode .card-summary,
     body.dark-mode .panel,
     body.dark-mode .table-wrapper,
-    body.dark-mode .import-box,
     body.dark-mode .reminder-card {
       background: #1e293b;
       border-color: #334155;
@@ -82,6 +80,11 @@
       background: #2d3a4e;
       border-left-color: #f4a261;
     }
+    body.dark-mode #formModeBadge,
+    body.dark-mode #invFormModeBadge {
+      background: #2d3a4e !important;
+      color: #cbd5e1 !important;
+    }
     .container {
       max-width: 1400px;
       margin: 0 auto;
@@ -108,7 +111,12 @@
       background-clip: text;
       -webkit-background-clip: text;
     }
-    .dark-toggle {
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .dark-toggle, .excel-import-btn {
       background: #2c3e50;
       color: white;
       border: none;
@@ -116,13 +124,20 @@
       border-radius: 40px;
       font-size: 0.85rem;
       cursor: pointer;
-      display: flex;
+      display: inline-flex;
       align-items: center;
       gap: 6px;
     }
     body.dark-mode .dark-toggle {
       background: #fbbf24;
       color: #1e293b;
+    }
+    .excel-import-btn {
+      background: #2c7da0;
+    }
+    body.dark-mode .excel-import-btn {
+      background: #2c7da0;
+      color: white;
     }
     .sub {
       color: #4a627a;
@@ -356,30 +371,6 @@
       background: #fef0ef;
       color: #c75c4a;
     }
-    .import-box {
-      background: #eef7fb;
-      border-radius: 24px;
-      padding: 16px 20px;
-      margin-bottom: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-    .file-label {
-      background: #2c7da0;
-      color: white;
-      padding: 8px 18px;
-      border-radius: 40px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: 0.2s;
-    }
-    .file-label:hover {
-      background: #1f6392;
-    }
     .year-filter {
       display: flex;
       align-items: center;
@@ -427,8 +418,8 @@
         flex-direction: column;
         align-items: stretch;
       }
-      .dark-toggle {
-        align-self: flex-end;
+      .header-actions {
+        justify-content: flex-end;
       }
     }
   </style>
@@ -437,9 +428,12 @@
 <div class="container">
   <div class="top-bar">
     <h1>💰 Smart Ledger Pro</h1>
-    <button id="darkModeToggle" class="dark-toggle">🌙 Dark Mode</button>
+    <div class="header-actions">
+      <button id="excelImportBtn" class="excel-import-btn">📂 Import Excel</button>
+      <button id="darkModeToggle" class="dark-toggle">🌙 Dark Mode</button>
+    </div>
   </div>
-  <div class="sub">Budget tracker + Annual income + Investments + Excel Import</div>
+  <div class="sub">Budget tracker + Annual income + Investments</div>
 
   <div class="tabs">
     <button class="tab-btn active" data-tab="budget">📊 Budget Tracker</button>
@@ -470,16 +464,6 @@
       <div class="action-buttons"><button id="saveFixedBtn" class="secondary">💾 Save fixed income</button></div>
     </div>
 
-    <!-- Excel Import Section -->
-    <div class="import-box">
-      <div><strong>📁 Import from Excel</strong> — Upload your salary file. Take‑home pay will be used as Net Pay.</div>
-      <div>
-        <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;">
-        <label for="excelFileInput" class="file-label">Choose Excel File</label>
-        <button id="importExcelBtn" class="secondary" style="margin-left: 8px;">Import & Add Records</button>
-      </div>
-    </div>
-
     <!-- ADD / EDIT ENTRY (Manual) -->
     <div class="panel" id="entryFormPanel">
       <div style="display: flex; justify-content: space-between; align-items: center;">
@@ -505,7 +489,7 @@
         <div class="input-field"><label>🏠 Amortization (GreenResidences)</label><input type="number" id="amortization" step="0.01" value="9500"></div>
         <div class="input-field"><label>🚗 Car</label><input type="number" id="carFixed" step="0.01" value="2500"></div>
         <div class="input-field"><label>🏦 MP2 Contribution</label><input type="number" id="mp2Amount" step="0.01" value="2500"></div>
-        <div class="input-field"><label>💰 Savings</label><input type="number" id="savingsAmount" step="0.01" value="5589" placeholder="Will be rounded to nearest hundred"></div>
+        <div class="input-field"><label>💰 Savings</label><input type="number" id="savingsAmount" step="0.01" placeholder="Will be rounded to nearest hundred"></div>
       </div>
       <div class="badge-info">💡 Savings defaults to 15% of Net Pay (rounded to nearest hundred). Amortization + Car are combined for BDO transfer.</div>
 
@@ -540,27 +524,30 @@
       <table class="entries-table">
         <thead>
           <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>BDO Transfer</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th> </thead>
-        <tbody id="entriesBody">发展<td colspan="10">No records. Add a manual entry or import Excel.发展</tbody>
-       </table>
+        <tbody id="entriesBody">
+          <tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr>
+        </tbody>
+        <tfoot id="entriesFoot" style="background: #f8fafc; font-weight: 600;"></tfoot>
+      </table>
     </div>
   </div>
 
   <!-- ANNUAL INCOME TAB -->
-  <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead> <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th> </tr></thead><tbody id="annualBody"></tbody> </table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+  <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead>  <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th> </tr></thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
 
   <!-- INVESTMENTS TAB -->
-  <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2><button id="resetInvestmentsBtn" class="danger">Reset all investments</button></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th> </tr></thead><tbody id="investmentsBody"></tbody> </table></div></div>
+  <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2><button id="resetInvestmentsBtn" class="danger">Reset all investments</button></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead><tbody id="investmentsBody"></tbody></table></div></div>
 
   <footer>📌 Internet bill reminder: ₱10,000/year due June 15. Reminder appears on May 30. All data saved locally.</footer>
 </div>
 
 <script>
   // ==================== STORAGE KEYS ====================
-  const ENTRIES_KEY = 'smartLedgerPro_entries_v10';
-  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v10';
-  const INTERNET_PAID_KEY = 'internetPaidYears_v10';
-  const ANNUAL_KEY = 'annualIncomeData_v8';
-  const INVESTMENTS_KEY = 'investmentsData_v6';
+  const ENTRIES_KEY = 'smartLedgerPro_entries_v11';
+  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v11';
+  const INTERNET_PAID_KEY = 'internetPaidYears_v11';
+  const ANNUAL_KEY = 'annualIncomeData_v9';
+  const INVESTMENTS_KEY = 'investmentsData_v7';
   const DARK_MODE_KEY = 'darkModeEnabled';
 
   // ==================== DARK MODE ====================
@@ -717,10 +704,48 @@
     select.value = currentYearFilter;
   }
 
+  function renderTotalRow(filteredEntries) {
+    if (!filteredEntries.length) {
+      document.getElementById('entriesFoot').innerHTML = '';
+      return;
+    }
+    const totals = {
+      gross: 0, deductions: 0, netPay: 0, bdo: 0, mp2: 0, savings: 0, tights: 0, surplus: 0
+    };
+    filteredEntries.forEach(e => {
+      totals.gross += getEntryNetPay(e) + computeEntryDeductions(e);
+      totals.deductions += computeEntryDeductions(e);
+      totals.netPay += getEntryNetPay(e);
+      totals.bdo += computeEntryBDO(e);
+      totals.mp2 += computeEntryMP2(e);
+      totals.savings += computeEntrySavings(e);
+      totals.tights += computeEntryTights(e);
+      totals.surplus += computeEntryFinal(e);
+    });
+    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">
+      <td><strong>TOTAL</strong></td>
+      <td>₱${totals.gross.toLocaleString(2)}</td>
+      <td>₱${totals.deductions.toLocaleString(2)}</td>
+      <td>₱${totals.netPay.toLocaleString(2)}</td>
+      <td>₱${totals.bdo.toLocaleString(2)}</td>
+      <td>₱${totals.mp2.toLocaleString(2)}</td>
+      <td>₱${totals.savings.toLocaleString(2)}</td>
+      <td>₱${totals.tights.toLocaleString(2)}</td>
+      <td>₱${totals.surplus.toLocaleString(2)}</td>
+      <td></td>
+    </tr>`;
+    document.getElementById('entriesFoot').innerHTML = footRow;
+  }
+
   function renderEntriesTable() {
     const filteredEntries = currentYearFilter === 'all' ? entries : entries.filter(e => new Date(e.date).getFullYear() === parseInt(currentYearFilter));
     const tbody = document.getElementById('entriesBody');
-    if (!filteredEntries.length) { tbody.innerHTML = '<tr><td colspan="10">No records for selected year.</td></tr>'; renderBudgetDashboard(); return; }
+    if (!filteredEntries.length) {
+      tbody.innerHTML = '<tr><td colspan="10">No records for selected year.</td></tr>';
+      renderTotalRow([]);
+      renderBudgetDashboard();
+      return;
+    }
     const sorted = [...filteredEntries].sort((a,b)=>new Date(b.date)-new Date(a.date));
     tbody.innerHTML = '';
     sorted.forEach(e => {
@@ -738,6 +763,7 @@
       row.insertCell(9).innerHTML = `<button class="edit-btn" data-id="${e.id}">✏️ Edit</button><button class="delete-btn" data-id="${e.id}">🗑️ Del</button>`;
     });
     attachEntryButtons();
+    renderTotalRow(filteredEntries);
     renderBudgetDashboard();
   }
   function attachEntryButtons() {
@@ -886,19 +912,27 @@
     });
   }
 
-  async function importExcel(file) {
-    try {
-      const newEntries = await parseExcelToEntries(file);
-      if(newEntries.length === 0) { alert('No valid pay periods found in Excel (missing Take Home Pay).'); return; }
-      entries.push(...newEntries);
-      saveEntries();
-      updateYearFilterOptions();
-      renderEntriesTable();
-      alert(`Imported ${newEntries.length} pay period records.`);
-    } catch(err) { console.error(err); alert('Error parsing Excel: '+err.message); }
+  async function importExcel() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx,.xls,.csv';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const newEntries = await parseExcelToEntries(file);
+        if(newEntries.length === 0) { alert('No valid pay periods found in Excel (missing Take Home Pay).'); return; }
+        entries.push(...newEntries);
+        saveEntries();
+        updateYearFilterOptions();
+        renderEntriesTable();
+        alert(`Imported ${newEntries.length} pay period records.`);
+      } catch(err) { console.error(err); alert('Error parsing Excel: '+err.message); }
+    };
+    input.click();
   }
 
-  // ==================== INVESTMENTS (simplified) ====================
+  // ==================== INVESTMENTS ====================
   function loadInvestments() { const s=localStorage.getItem(INVESTMENTS_KEY); investments=s?JSON.parse(s):[]; if(!investments.length) investments=[{id:Date.now(),title:"Sample",description:"",totalInvested:0,totalProfit:0,maintenance:0}]; saveInvestments(); }
   function saveInvestments() { localStorage.setItem(INVESTMENTS_KEY,JSON.stringify(investments)); }
   function renderInvestmentsTable() {
@@ -983,6 +1017,7 @@
     updateYearFilterOptions();
     renderAllBudget(); renderAnnualTable(); renderInvestmentsTable();
     document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
+    document.getElementById('excelImportBtn').addEventListener('click', importExcel);
     document.getElementById('saveFixedBtn').addEventListener('click',saveFixedSettings);
     document.getElementById('submitEntryBtn').addEventListener('click',submitEntry);
     document.getElementById('cancelEditBtn').addEventListener('click',clearForm);
@@ -991,8 +1026,6 @@
     document.getElementById('submitInvBtn').addEventListener('click',submitInvestment);
     document.getElementById('cancelInvEditBtn').addEventListener('click',clearInvestmentForm);
     document.getElementById('resetInvestmentsBtn').addEventListener('click',resetInvestments);
-    document.getElementById('importExcelBtn').addEventListener('click',()=>document.getElementById('excelFileInput').click());
-    document.getElementById('excelFileInput').addEventListener('change',e=>{if(e.target.files.length) importExcel(e.target.files[0]);});
     document.getElementById('yearFilterSelect').addEventListener('change', e => {
       currentYearFilter = e.target.value;
       renderEntriesTable();
