@@ -4,267 +4,50 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
   <title>Smart Ledger Pro | Budget + Annual + Investments + Excel Import</title>
-  <!-- SheetJS for Excel parsing -->
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif;
-    }
-    body {
-      background: #eef3fa;
-      padding: 20px 16px 48px;
-      color: #1a2c3e;
-    }
-    .container {
-      max-width: 1400px;
-      margin: 0 auto;
-    }
-    h1 {
-      font-size: 1.8rem;
-      font-weight: 700;
-      background: linear-gradient(135deg, #1e3c72, #2b4c7c);
-      background-clip: text;
-      -webkit-background-clip: text;
-      color: transparent;
-      margin-bottom: 6px;
-    }
-    .sub {
-      color: #4a627a;
-      margin-bottom: 24px;
-      border-left: 4px solid #2c7da0;
-      padding-left: 14px;
-      font-weight: 450;
-      font-size: 0.9rem;
-    }
-    .tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 28px;
-      border-bottom: 2px solid #cbdde6;
-      flex-wrap: wrap;
-    }
-    .tab-btn {
-      background: none;
-      border: none;
-      padding: 12px 24px;
-      font-size: 1rem;
-      font-weight: 600;
-      color: #5b7a9a;
-      cursor: pointer;
-      border-radius: 30px 30px 0 0;
-      transition: 0.2s;
-    }
-    .tab-btn.active {
-      color: #1f6392;
-      background: white;
-      border-bottom: 3px solid #1f6392;
-      margin-bottom: -2px;
-    }
-    .tab-content {
-      display: none;
-    }
-    .tab-content.active {
-      display: block;
-    }
-    .dashboard {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-    .card-summary {
-      background: white;
-      border-radius: 28px;
-      padding: 18px 20px;
-      flex: 1 1 170px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.02);
-      border: 1px solid #e2edf2;
-    }
-    .card-summary h3 {
-      font-size: 0.8rem;
-      font-weight: 600;
-      text-transform: uppercase;
-      color: #5b7a9a;
-      margin-bottom: 8px;
-    }
-    .card-summary .amount {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #1f3b4c;
-    }
-    .panel {
-      background: white;
-      border-radius: 32px;
-      padding: 20px 24px;
-      margin-bottom: 28px;
-      border: 1px solid #e0ecf2;
-      box-shadow: 0 6px 14px rgba(0,0,0,0.02);
-    }
-    .section-title {
-      font-weight: 700;
-      font-size: 1.2rem;
-      margin: 16px 0 12px 0;
-      padding-bottom: 6px;
-      border-bottom: 2px solid #cbdde6;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; }
+    body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
+    .container { max-width: 1400px; margin: 0 auto; }
+    h1 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #1e3c72, #2b4c7c); background-clip: text; -webkit-background-clip: text; color: transparent; margin-bottom: 6px; }
+    .sub { color: #4a627a; margin-bottom: 24px; border-left: 4px solid #2c7da0; padding-left: 14px; font-weight: 450; font-size: 0.9rem; }
+    .tabs { display: flex; gap: 8px; margin-bottom: 28px; border-bottom: 2px solid #cbdde6; flex-wrap: wrap; }
+    .tab-btn { background: none; border: none; padding: 12px 24px; font-size: 1rem; font-weight: 600; color: #5b7a9a; cursor: pointer; border-radius: 30px 30px 0 0; transition: 0.2s; }
+    .tab-btn.active { color: #1f6392; background: white; border-bottom: 3px solid #1f6392; margin-bottom: -2px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+    .dashboard { display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 28px; }
+    .card-summary { background: white; border-radius: 28px; padding: 18px 20px; flex: 1 1 170px; box-shadow: 0 4px 12px rgba(0,0,0,0.02); border: 1px solid #e2edf2; }
+    .card-summary h3 { font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: #5b7a9a; margin-bottom: 8px; }
+    .card-summary .amount { font-size: 1.6rem; font-weight: 700; color: #1f3b4c; }
+    .panel { background: white; border-radius: 32px; padding: 20px 24px; margin-bottom: 28px; border: 1px solid #e0ecf2; box-shadow: 0 6px 14px rgba(0,0,0,0.02); }
+    .section-title { font-weight: 700; font-size: 1.2rem; margin: 16px 0 12px 0; padding-bottom: 6px; border-bottom: 2px solid #cbdde6; display: flex; align-items: center; gap: 10px; }
     .section-title:first-of-type { margin-top: 0; }
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
-      gap: 16px 20px;
-      margin-bottom: 12px;
-    }
-    .input-field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .input-field label {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #2c4c6e;
-    }
-    .input-field input, .input-field textarea {
-      padding: 10px 12px;
-      border: 1px solid #cbdde6;
-      border-radius: 20px;
-      font-size: 0.9rem;
-      background: #fefefe;
-      font-family: inherit;
-    }
-    .input-field textarea {
-      resize: vertical;
-      min-height: 70px;
-    }
-    .input-field input:focus, .input-field textarea:focus {
-      outline: none;
-      border-color: #2c7da0;
-      box-shadow: 0 0 0 3px rgba(44,125,160,0.2);
-    }
-    .badge-info {
-      background: #eef2f8;
-      padding: 8px 14px;
-      border-radius: 40px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      display: inline-block;
-      margin-top: 8px;
-    }
-    .action-buttons {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 14px;
-      margin-top: 24px;
-      justify-content: flex-end;
-    }
-    button {
-      border: none;
-      background: #eef3f8;
-      padding: 10px 22px;
-      border-radius: 40px;
-      font-weight: 600;
-      font-size: 0.85rem;
-      cursor: pointer;
-      transition: 0.2s;
-    }
-    button.primary {
-      background: #1f6392;
-      color: white;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    button.secondary {
-      background: #e1ecf3;
-      color: #1f6392;
-    }
-    button.danger {
-      background: #ffe6e5;
-      color: #bc3f2e;
-    }
-    .reminder-card {
-      background: #fff7e8;
-      border-left: 6px solid #f4a261;
-      border-radius: 24px;
-      padding: 14px 20px;
-      margin-bottom: 24px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .table-wrapper {
-      overflow-x: auto;
-      border-radius: 28px;
-      background: white;
-      border: 1px solid #e2edf2;
-    }
-    .entries-table, .investments-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.8rem;
-      min-width: 800px;
-    }
-    .entries-table th, .investments-table th, .annual-table th {
-      text-align: left;
-      padding: 14px 10px;
-      background: #f0f6fa;
-      font-weight: 600;
-      color: #2b5d7c;
-    }
-    .entries-table td, .investments-table td, .annual-table td {
-      padding: 12px 10px;
-      border-top: 1px solid #e6edf2;
-    }
-    .edit-btn, .delete-btn {
-      background: none;
-      padding: 4px 12px;
-      font-size: 0.7rem;
-      border-radius: 30px;
-      margin: 0 4px;
-    }
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 16px 20px; margin-bottom: 12px; }
+    .input-field { display: flex; flex-direction: column; gap: 6px; }
+    .input-field label { font-size: 0.75rem; font-weight: 600; color: #2c4c6e; }
+    .input-field input, .input-field textarea { padding: 10px 12px; border: 1px solid #cbdde6; border-radius: 20px; font-size: 0.9rem; background: #fefefe; font-family: inherit; }
+    .input-field textarea { resize: vertical; min-height: 70px; }
+    .input-field input:focus, .input-field textarea:focus { outline: none; border-color: #2c7da0; box-shadow: 0 0 0 3px rgba(44,125,160,0.2); }
+    .badge-info { background: #eef2f8; padding: 8px 14px; border-radius: 40px; font-size: 0.75rem; font-weight: 500; display: inline-block; margin-top: 8px; }
+    .action-buttons { display: flex; flex-wrap: wrap; gap: 14px; margin-top: 24px; justify-content: flex-end; }
+    button { border: none; background: #eef3f8; padding: 10px 22px; border-radius: 40px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: 0.2s; }
+    button.primary { background: #1f6392; color: white; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+    button.secondary { background: #e1ecf3; color: #1f6392; }
+    button.danger { background: #ffe6e5; color: #bc3f2e; }
+    .reminder-card { background: #fff7e8; border-left: 6px solid #f4a261; border-radius: 24px; padding: 14px 20px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .table-wrapper { overflow-x: auto; border-radius: 28px; background: white; border: 1px solid #e2edf2; }
+    .entries-table, .investments-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; min-width: 800px; }
+    .entries-table th, .investments-table th, .annual-table th { text-align: left; padding: 14px 10px; background: #f0f6fa; font-weight: 600; color: #2b5d7c; }
+    .entries-table td, .investments-table td, .annual-table td { padding: 12px 10px; border-top: 1px solid #e6edf2; }
+    .edit-btn, .delete-btn { background: none; padding: 4px 12px; font-size: 0.7rem; border-radius: 30px; margin: 0 4px; }
     .edit-btn { background: #e4f0f5; color: #1f6392; }
     .delete-btn { background: #fef0ef; color: #c75c4a; }
-    .import-box {
-      background: #eef7fb;
-      border-radius: 24px;
-      padding: 16px 20px;
-      margin-bottom: 20px;
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 16px;
-    }
-    .file-label {
-      background: #2c7da0;
-      color: white;
-      padding: 8px 18px;
-      border-radius: 40px;
-      cursor: pointer;
-      font-size: 0.85rem;
-      font-weight: 500;
-      transition: 0.2s;
-    }
-    .file-label:hover {
-      background: #1f6392;
-    }
-    footer {
-      margin-top: 32px;
-      text-align: center;
-      font-size: 0.7rem;
-      color: #7c9ab0;
-    }
-    @media (max-width: 680px) {
-      .form-grid { grid-template-columns: 1fr; }
-      .card-summary .amount { font-size: 1.3rem; }
-      .tab-btn { padding: 8px 16px; font-size: 0.9rem; }
-    }
+    .import-box { background: #eef7fb; border-radius: 24px; padding: 16px 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px; }
+    .file-label { background: #2c7da0; color: white; padding: 8px 18px; border-radius: 40px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: 0.2s; }
+    .file-label:hover { background: #1f6392; }
+    footer { margin-top: 32px; text-align: center; font-size: 0.7rem; color: #7c9ab0; }
+    @media (max-width: 680px) { .form-grid { grid-template-columns: 1fr; } .card-summary .amount { font-size: 1.3rem; } .tab-btn { padding: 8px 16px; font-size: 0.9rem; } }
   </style>
 </head>
 <body>
@@ -272,7 +55,6 @@
   <h1>💰 Smart Ledger Pro</h1>
   <div class="sub">Budget tracker + Annual income + Investments + Excel Import</div>
 
-  <!-- TABS -->
   <div class="tabs">
     <button class="tab-btn active" data-tab="budget">📊 Budget Tracker</button>
     <button class="tab-btn" data-tab="annual">📅 Annual Income</button>
@@ -281,19 +63,16 @@
 
   <!-- BUDGET TRACKER TAB -->
   <div id="budgetTab" class="tab-content active">
-    <!-- INTERNET REMINDER -->
     <div id="internetReminder" class="reminder-card" style="display: none;"></div>
-
-    <!-- KPI CARDS -->
     <div class="dashboard">
       <div class="card-summary"><h3>📆 This Year Savings</h3><div class="amount" id="yearlySavings">₱0</div></div>
       <div class="card-summary"><h3>🏦 Total MP2</h3><div class="amount" id="totalMP2">₱0</div></div>
       <div class="card-summary"><h3>🧦 Total Tights</h3><div class="amount" id="totalTights">₱0</div></div>
     </div>
 
-    <!-- FIXED INCOME (Editable) -->
+    <!-- FIXED INCOME (Editable, used for manual entries only) -->
     <div class="panel">
-      <div class="section-title">⚙️ Fixed Income per Pay Period (used for manual entries, override by Excel import)</div>
+      <div class="section-title">⚙️ Fixed Income per Pay Period (for manual entries)</div>
       <div class="form-grid">
         <div class="input-field"><label>Basic Pay</label><input type="number" id="fixedBasic" step="0.01" value="37260"></div>
         <div class="input-field"><label>Laundry Allowance</label><input type="number" id="fixedLaundry" step="0.01" value="150"></div>
@@ -307,7 +86,7 @@
 
     <!-- Excel Import Section -->
     <div class="import-box">
-      <div><strong>📁 Import from Excel</strong> — Upload your salary Excel file (format as shown in your sample). New pay periods will be added.</div>
+      <div><strong>📁 Import from Excel</strong> — Upload your salary file. Take‑home pay will be used as Net Pay.</div>
       <div>
         <input type="file" id="excelFileInput" accept=".xlsx, .xls, .csv" style="display: none;">
         <label for="excelFileInput" class="file-label">Choose Excel File</label>
@@ -315,16 +94,16 @@
       </div>
     </div>
 
-    <!-- ADD / EDIT ENTRY -->
+    <!-- ADD / EDIT ENTRY (Manual) -->
     <div class="panel" id="entryFormPanel">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h3 style="font-weight: 600;">📝 Record Pay Period</h3>
+        <h3 style="font-weight: 600;">📝 Record Pay Period (Manual)</h3>
         <span id="formModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px; font-size:0.7rem;">New entry</span>
       </div>
       <input type="hidden" id="editId" value="">
       <div class="form-grid">
-        <div class="input-field"><label>📅 Payday Date (15th or 30th)</label><input type="date" id="entryDate" required></div>
-        <div class="input-field"><label>💸 Actual Net Pay Received (optional)</label><input type="number" id="actualNetPay" step="0.01" placeholder="Leave blank to use computed net"></div>
+        <div class="input-field"><label>📅 Payday Date</label><input type="date" id="entryDate" required></div>
+        <div class="input-field"><label>💸 Net Pay Received</label><input type="number" id="actualNetPay" step="0.01" placeholder="Amount you actually received"></div>
       </div>
 
       <div class="section-title">🏛️ Fixed Gov't Deductions (per pay period)</div>
@@ -340,9 +119,9 @@
         <div class="input-field"><label>🏠 Amortization (GreenResidences)</label><input type="number" id="amortization" step="0.01" value="9500"></div>
         <div class="input-field"><label>🚗 Car</label><input type="number" id="carFixed" step="0.01" value="2500"></div>
         <div class="input-field"><label>🏦 MP2 Contribution</label><input type="number" id="mp2Amount" step="0.01" value="2500"></div>
-        <div class="input-field"><label>💰 Savings</label><input type="number" id="savingsAmount" step="0.01" value="5589" placeholder="Defaults to 15% of Basic Pay"></div>
+        <div class="input-field"><label>💰 Savings</label><input type="number" id="savingsAmount" step="0.01" value="5589" placeholder="Will be rounded to nearest hundred"></div>
       </div>
-      <div class="badge-info">💡 Savings defaults to 15% of Basic Pay (adjustable per entry). Amortization + Car are combined for BDO transfer.</div>
+      <div class="badge-info">💡 Savings defaults to 15% of Net Pay (rounded to nearest hundred). Amortization + Car are combined for BDO transfer.</div>
 
       <div class="section-title">📋 Variable Expenses</div>
       <div class="form-grid">
@@ -368,14 +147,14 @@
     <div class="table-wrapper">
       <table class="entries-table">
         <thead>
-          <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay (Used)</th><th>BDO Transfer</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th> </thead>
-        <tbody id="entriesBody"><tr><td colspan="10">No records. Add payday or import Excel.</td></tr></tbody>
-      </table>
+          <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>BDO Transfer</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th> </thead>
+        <tbody id="entriesBody">发展<td colspan="10">No records. Add a manual entry or import Excel.发展</tbody>
+       </table>
     </div>
   </div>
 
   <!-- ANNUAL INCOME TAB (unchanged) -->
-  <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead><tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr></thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+  <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead> <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr> </thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
 
   <!-- INVESTMENTS TAB (unchanged) -->
   <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2><button id="resetInvestmentsBtn" class="danger">Reset all investments</button></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead><tbody id="investmentsBody"></tbody></table></div></div>
@@ -385,13 +164,12 @@
 
 <script>
   // ==================== STORAGE KEYS ====================
-  const ENTRIES_KEY = 'smartLedgerPro_entries_v7';
-  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v7';
-  const INTERNET_PAID_KEY = 'internetPaidYears_v7';
-  const ANNUAL_KEY = 'annualIncomeData_v5';
-  const INVESTMENTS_KEY = 'investmentsData_v3';
+  const ENTRIES_KEY = 'smartLedgerPro_entries_v8';
+  const FIXED_KEY = 'smartLedgerPro_fixedIncome_v8';
+  const INTERNET_PAID_KEY = 'internetPaidYears_v8';
+  const ANNUAL_KEY = 'annualIncomeData_v6';
+  const INVESTMENTS_KEY = 'investmentsData_v4';
 
-  // ==================== GLOBAL DATA ====================
   let fixedIncome = { basic: 37260, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
   let entries = [];
   let annualData = [];
@@ -463,10 +241,8 @@
     };
     localStorage.setItem(FIXED_KEY, JSON.stringify(fixedIncome));
     alert('Fixed income saved.');
-    updateSavingsDefault();
     renderAllBudget();
   }
-  function updateSavingsDefault() { if(!document.getElementById('editId').value) document.getElementById('savingsAmount').value = (fixedIncome.basic * 0.15).toFixed(2); }
 
   function loadEntries() {
     const stored = localStorage.getItem(ENTRIES_KEY);
@@ -474,37 +250,31 @@
     if (!entries.length) {
       const demoDate = new Date(); demoDate.setDate(15);
       entries = [{
-        id: Date.now(), date: demoDate.toISOString().slice(0,10), actualNetPay: null,
+        id: Date.now(),
+        date: demoDate.toISOString().slice(0,10),
+        netPay: fixedIncome.basic + fixedIncome.laundry + fixedIncome.clothing + fixedIncome.communication + fixedIncome.meal + fixedIncome.rice - (750+1863+200+1000),
         mpf: 750, philhealth: 1863, hdmf: 200, sss: 1000,
         amortization: 9500, carFixed: 2500, mp2Amount: 2500,
-        savingsAmount: fixedIncome.basic * 0.15,
+        savingsAmount: Math.round((fixedIncome.basic * 0.15) / 100) * 100,
         electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
-        // store income components for demo
-        basicIncome: fixedIncome.basic, laundryAllow: fixedIncome.laundry, clothingAllow: fixedIncome.clothing,
-        commAllow: fixedIncome.communication, mealIncome: fixedIncome.meal, riceIncome: fixedIncome.rice
       }];
       saveEntries();
     }
   }
   function saveEntries() { localStorage.setItem(ENTRIES_KEY, JSON.stringify(entries)); }
 
-  // Helper: compute entry gross using stored income fields (if present) else global fixedIncome
-  function getEntryGrossIncome(entry) {
-    if (entry.basicIncome !== undefined) {
-      return (entry.basicIncome||0) + (entry.laundryAllow||0) + (entry.clothingAllow||0) + (entry.commAllow||0) + (entry.mealIncome||0) + (entry.riceIncome||0);
-    }
-    return fixedIncome.basic + fixedIncome.laundry + fixedIncome.clothing + fixedIncome.communication + fixedIncome.meal + fixedIncome.rice;
+  // Helper: get the actual net pay for an entry (used for allocations)
+  function getEntryNetPay(entry) {
+    if (entry.netPay !== undefined) return entry.netPay;
+    // fallback for old entries (should not happen)
+    return (entry.actualNetPay && entry.actualNetPay>0) ? entry.actualNetPay : 0;
   }
-  function getEntryDeductions(entry) { return (entry.mpf||0)+(entry.philhealth||0)+(entry.hdmf||0)+(entry.sss||0); }
-  function getEntryNetPayUsed(entry) {
-    if (entry.actualNetPay && entry.actualNetPay>0) return entry.actualNetPay;
-    return getEntryGrossIncome(entry) - getEntryDeductions(entry);
-  }
+
+  function computeEntrySavings(entry) { return entry.savingsAmount || 0; }
   function computeEntryBDO(e) { return (e.amortization||0)+(e.carFixed||0); }
   function computeEntryMP2(e) { return e.mp2Amount||0; }
-  function computeEntrySavings(e) { return parseFloat(e.savingsAmount) || 0; } // ensure number
   function computeEntryRemainingAfter(e) {
-    const net = getEntryNetPayUsed(e);
+    const net = getEntryNetPay(e);
     const savings = computeEntrySavings(e);
     const bdo = computeEntryBDO(e);
     const mp2 = computeEntryMP2(e);
@@ -529,15 +299,18 @@
 
   function renderEntriesTable() {
     const tbody = document.getElementById('entriesBody');
-    if (!entries.length) { tbody.innerHTML='<tr><td colspan="10">No records.</td></tr>'; renderBudgetDashboard(); return; }
+    if (!entries.length) { tbody.innerHTML='<tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr>'; renderBudgetDashboard(); return; }
     const sorted = [...entries].sort((a,b)=>new Date(b.date)-new Date(a.date));
     tbody.innerHTML = '';
     sorted.forEach(e => {
       const row = tbody.insertRow();
       row.insertCell(0).innerText = e.date;
-      row.insertCell(1).innerHTML = '₱'+getEntryGrossIncome(e).toLocaleString(2);
-      row.insertCell(2).innerHTML = '₱'+getEntryDeductions(e).toLocaleString(2);
-      row.insertCell(3).innerHTML = '₱'+getEntryNetPayUsed(e).toLocaleString(2)+(e.actualNetPay?' (actual)':'');
+      // Gross Income = Net Pay + Deductions (if deductions exist)
+      const gross = getEntryNetPay(e) + (e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0);
+      row.insertCell(1).innerHTML = '₱'+gross.toLocaleString(2);
+      const deductions = (e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0);
+      row.insertCell(2).innerHTML = '₱'+deductions.toLocaleString(2);
+      row.insertCell(3).innerHTML = '₱'+getEntryNetPay(e).toLocaleString(2);
       row.insertCell(4).innerHTML = '₱'+computeEntryBDO(e).toLocaleString(2);
       row.insertCell(5).innerHTML = '₱'+computeEntryMP2(e).toLocaleString(2);
       row.insertCell(6).innerHTML = '₱'+computeEntrySavings(e).toLocaleString(2);
@@ -556,7 +329,7 @@
     const e=entries.find(x=>x.id===id); if(!e) return;
     document.getElementById('editId').value=e.id;
     document.getElementById('entryDate').value=e.date;
-    document.getElementById('actualNetPay').value=e.actualNetPay||'';
+    document.getElementById('actualNetPay').value=getEntryNetPay(e);
     document.getElementById('mpf').value=e.mpf||750;
     document.getElementById('philhealth').value=e.philhealth||1863;
     document.getElementById('hdmf').value=e.hdmf||200;
@@ -564,7 +337,7 @@
     document.getElementById('amortization').value=e.amortization||9500;
     document.getElementById('carFixed').value=e.carFixed||2500;
     document.getElementById('mp2Amount').value=e.mp2Amount||2500;
-    document.getElementById('savingsAmount').value=e.savingsAmount||(fixedIncome.basic*0.15).toFixed(2);
+    document.getElementById('savingsAmount').value=e.savingsAmount||Math.round((getEntryNetPay(e)*0.15)/100)*100;
     document.getElementById('electric').value=e.electric||0;
     document.getElementById('waterHoa').value=e.waterHoa||0;
     document.getElementById('internet').value=e.internet||0;
@@ -586,7 +359,7 @@
     document.getElementById('amortization').value=9500;
     document.getElementById('carFixed').value=2500;
     document.getElementById('mp2Amount').value=2500;
-    document.getElementById('savingsAmount').value=(fixedIncome.basic*0.15).toFixed(2);
+    document.getElementById('savingsAmount').value='';
     document.getElementById('electric').value=0;
     document.getElementById('waterHoa').value=0;
     document.getElementById('internet').value=0;
@@ -597,10 +370,10 @@
     document.getElementById('cancelEditBtn').style.display='none';
   }
   function getFormData() {
-    const actual = document.getElementById('actualNetPay').value;
+    const net = parseFloat(document.getElementById('actualNetPay').value);
     return {
       date: document.getElementById('entryDate').value,
-      actualNetPay: actual?parseFloat(actual):null,
+      netPay: isNaN(net) ? 0 : net,
       mpf: parseFloat(document.getElementById('mpf').value)||0,
       philhealth: parseFloat(document.getElementById('philhealth').value)||0,
       hdmf: parseFloat(document.getElementById('hdmf').value)||0,
@@ -608,7 +381,7 @@
       amortization: parseFloat(document.getElementById('amortization').value)||0,
       carFixed: parseFloat(document.getElementById('carFixed').value)||0,
       mp2Amount: parseFloat(document.getElementById('mp2Amount').value)||0,
-      savingsAmount: parseFloat(document.getElementById('savingsAmount').value)||0,
+      savingsAmount: parseFloat(document.getElementById('savingsAmount').value) || Math.round((net*0.15)/100)*100,
       electric: parseFloat(document.getElementById('electric').value)||0,
       waterHoa: parseFloat(document.getElementById('waterHoa').value)||0,
       internet: parseFloat(document.getElementById('internet').value)||0,
@@ -619,28 +392,20 @@
   function submitEntry() {
     const data = getFormData();
     if(!data.date){alert('Select date');return;}
+    if(data.netPay<=0){alert('Please enter a valid Net Pay amount.');return;}
+    // Round savings to nearest hundred if not manually set
+    if (data.savingsAmount === undefined || isNaN(data.savingsAmount) || data.savingsAmount===0) {
+      data.savingsAmount = Math.round((data.netPay * 0.15) / 100) * 100;
+    }
     const editId = document.getElementById('editId').value;
     if(editId){
       const idx = entries.findIndex(e=>e.id==editId);
       if(idx!==-1){
-        // preserve income fields if they exist
-        const existing = entries[idx];
-        entries[idx] = { ...existing, ...data, id: existing.id };
+        entries[idx] = { ...entries[idx], ...data, id: entries[idx].id };
         saveEntries(); renderEntriesTable(); clearForm();
       } else alert('Not found');
     } else {
-      // new entry: also store current fixed income values (for manual entries)
-      const newEntry = {
-        id: Date.now(),
-        ...data,
-        basicIncome: fixedIncome.basic,
-        laundryAllow: fixedIncome.laundry,
-        clothingAllow: fixedIncome.clothing,
-        commAllow: fixedIncome.communication,
-        mealIncome: fixedIncome.meal,
-        riceIncome: fixedIncome.rice,
-      };
-      entries.push(newEntry);
+      entries.push({ id: Date.now(), ...data });
       saveEntries(); renderEntriesTable(); clearForm();
     }
   }
@@ -659,17 +424,11 @@
         const headers = rows[0];
         const colIndex = (name) => headers.findIndex(cell => String(cell).trim() === name);
         const idxPeriod = colIndex("Period");
-        const idxBasic = colIndex("Basic Salary");
-        const idxClothing = colIndex("Clothing Allowance");
-        const idxComm = colIndex("Communication Allowance");
-        const idxLaundry = colIndex("Laundry Allowance");
-        const idxMeal = colIndex("Meal Allowance");
-        const idxRice = colIndex("Rice Subsidy");
+        const idxTakeHome = colIndex("Take Home Pay");
         const idxMPF = colIndex("MPF Employee Contribution");
         const idxPhil = colIndex("Phil Health Employee Contribution");
         const idxHDMF = colIndex("HDMF Employee Contribution");
         const idxSSS = colIndex("SSS Employee Contribution");
-        const idxTakeHome = colIndex("Take Home Pay");
         if(idxPeriod === -1) reject("Period column not found");
         const newEntries = [];
         for(let i=1; i<rows.length; i++) {
@@ -684,32 +443,23 @@
           let year = parseInt(parts[2]), month = parseInt(parts[0]), day = parseInt(parts[1]);
           let dateObj = new Date(year, month-1, day);
           let formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
-          let basic = parseFloat(row[idxBasic]) || 0;
-          let clothing = parseFloat(row[idxClothing]) || 0;
-          let comm = parseFloat(row[idxComm]) || 0;
-          let laundry = parseFloat(row[idxLaundry]) || 0;
-          let meal = parseFloat(row[idxMeal]) || 0;
-          let rice = parseFloat(row[idxRice]) || 0;
+          let takeHome = parseFloat(row[idxTakeHome]) || 0;
+          if(takeHome===0) continue;
+          // Read deductions if present, otherwise default 0
           let mpf = parseFloat(row[idxMPF]) || 0;
           let phil = parseFloat(row[idxPhil]) || 0;
           let hdmf = parseFloat(row[idxHDMF]) || 0;
           let sss = parseFloat(row[idxSSS]) || 0;
-          let takeHome = parseFloat(row[idxTakeHome]) || null;
+          // Round savings to nearest hundred based on take-home
+          let savings = Math.round((takeHome * 0.15) / 100) * 100;
           let newEntry = {
             id: Date.now() + i + Math.random(),
             date: formattedDate,
-            actualNetPay: takeHome && takeHome>0 ? takeHome : null,
+            netPay: takeHome,
             mpf, philhealth: phil, hdmf, sss,
             amortization: 9500, carFixed: 2500, mp2Amount: 2500,
-            savingsAmount: (fixedIncome.basic * 0.15), // store as number
+            savingsAmount: savings,
             electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
-            // store actual income components from Excel
-            basicIncome: basic,
-            laundryAllow: laundry,
-            clothingAllow: clothing,
-            commAllow: comm,
-            mealIncome: meal,
-            riceIncome: rice,
           };
           newEntries.push(newEntry);
         }
@@ -723,7 +473,7 @@
   async function importExcel(file) {
     try {
       const newEntries = await parseExcelToEntries(file);
-      if(newEntries.length === 0) { alert('No valid pay periods found in Excel.'); return; }
+      if(newEntries.length === 0) { alert('No valid pay periods found in Excel (missing Take Home Pay).'); return; }
       entries.push(...newEntries);
       saveEntries();
       renderEntriesTable();
@@ -825,8 +575,6 @@
     document.getElementById('excelFileInput').addEventListener('change',e=>{if(e.target.files.length) importExcel(e.target.files[0]);});
     document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
     if(!document.getElementById('entryDate').value) document.getElementById('entryDate').value=new Date().toISOString().slice(0,10);
-    updateSavingsDefault();
-    document.getElementById('fixedBasic').addEventListener('input',()=>updateSavingsDefault());
   });
 </script>
 </body>
