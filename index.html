@@ -161,7 +161,7 @@
           <div class="input-field"><label>🏦 MP2 Contribution</label><input type="number" id="mp2Amount" step="0.01" value="2500"></div>
           <div class="input-field"><label>💰 Savings</label><input type="number" id="savingsAmount" step="0.01" placeholder="Will be rounded to nearest hundred"></div>
         </div>
-        <div class="badge-info">💡 Savings defaults to 15% of Net Pay (rounded to nearest hundred). Amortization + Car are both subtracted for net surplus, but only Amortization is shown in the table.</div>
+        <div class="badge-info">💡 Savings defaults to 15% of Basic Pay (rounded to nearest hundred). Amortization + Car are both subtracted for net surplus, but only Amortization is shown in the table.</div>
         <div class="section-title">📋 Variable Expenses</div>
         <div class="form-grid">
           <div class="input-field"><label>⚡ Electric</label><input type="number" id="electric" step="0.01" value="0"></div>
@@ -182,7 +182,7 @@
       <div class="table-wrapper">
         <table class="entries-table">
           <thead>
-              <tr>
+             <tr>
                 <th>Date</th>
                 <th>Gross Income</th>
                 <th>Dockages</th>
@@ -275,6 +275,11 @@
   let fixedIncome = { basic: 37260, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
   let entries = [], annualData = [], investments = [], currentYearFilter = 'all';
 
+  // Helper to compute default savings based on basic pay (rounded to nearest hundred)
+  function getDefaultSavings() {
+    return Math.round((fixedIncome.basic * 0.15) / 100) * 100;
+  }
+
   // ---------- ANNUAL ----------
   function loadAnnualData() {
     const stored = localStorage.getItem('annualIncomeData_v15');
@@ -355,7 +360,7 @@
         dockages: 0,
         mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
         amortization: 9500, carFixed: 2500, mp2Amount: 2500,
-        savingsAmount: Math.round((demoNet * 0.15) / 100) * 100,
+        savingsAmount: getDefaultSavings(),
         electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
       }];
       saveEntries();
@@ -364,7 +369,7 @@
   function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v17', JSON.stringify(entries)); }
 
   function getEntryNetPay(e) { return e.netPay !== undefined ? e.netPay : 0; }
-  function computeEntrySavings(e) { return e.savingsAmount || 0; }
+  function computeEntrySavings(e) { return e.savingsAmount !== undefined ? e.savingsAmount : getDefaultSavings(); }
   function computeEntryAmortization(e) { return e.amortization || 0; }
   function computeEntryMP2(e) { return e.mp2Amount||0; }
   function computeEntryDockages(e) { return e.dockages !== undefined ? e.dockages : ((e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0)); }
@@ -411,17 +416,17 @@
       totals.surplus += computeEntryFinal(e);
     });
     const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">
-         <td><strong>TOTAL</strong></td>
-         <td>₱${totals.gross.toLocaleString(2)}</td>
-         <td>₱${totals.dockages.toLocaleString(2)}</td>
-         <td>₱${totals.netPay.toLocaleString(2)}</td>
-         <td>₱${totals.amort.toLocaleString(2)}</td>
-         <td>₱${totals.mp2.toLocaleString(2)}</td>
-         <td>₱${totals.savings.toLocaleString(2)}</td>
-         <td>₱${totals.tights.toLocaleString(2)}</td>
-         <td>₱${totals.surplus.toLocaleString(2)}</td>
-         <td></td>
-       </tr>`;
+          <td><strong>TOTAL</strong></td>
+          <td>₱${totals.gross.toLocaleString(2)}</td>
+          <td>₱${totals.dockages.toLocaleString(2)}</td>
+          <td>₱${totals.netPay.toLocaleString(2)}</td>
+          <td>₱${totals.amort.toLocaleString(2)}</td>
+          <td>₱${totals.mp2.toLocaleString(2)}</td>
+          <td>₱${totals.savings.toLocaleString(2)}</td>
+          <td>₱${totals.tights.toLocaleString(2)}</td>
+          <td>₱${totals.surplus.toLocaleString(2)}</td>
+          <td></td>
+        </tr>`;
     document.getElementById('entriesFoot').innerHTML = footRow;
   }
 
@@ -465,7 +470,7 @@
     document.getElementById('amortization').value=e.amortization||9500;
     document.getElementById('carFixed').value=e.carFixed||2500;
     document.getElementById('mp2Amount').value=e.mp2Amount||2500;
-    document.getElementById('savingsAmount').value=e.savingsAmount||Math.round((getEntryNetPay(e)*0.15)/100)*100;
+    document.getElementById('savingsAmount').value=e.savingsAmount !== undefined ? e.savingsAmount : getDefaultSavings();
     document.getElementById('electric').value=e.electric||0;
     document.getElementById('waterHoa').value=e.waterHoa||0;
     document.getElementById('internet').value=e.internet||0;
@@ -487,7 +492,7 @@
     document.getElementById('amortization').value=9500;
     document.getElementById('carFixed').value=2500;
     document.getElementById('mp2Amount').value=2500;
-    document.getElementById('savingsAmount').value='';
+    document.getElementById('savingsAmount').value=getDefaultSavings();
     document.getElementById('electric').value=0;
     document.getElementById('waterHoa').value=0;
     document.getElementById('internet').value=0;
@@ -504,6 +509,7 @@
     const hdmf = parseFloat(document.getElementById('hdmf').value)||0;
     const sss = parseFloat(document.getElementById('sss').value)||0;
     const totalDockages = mpf+phil+hdmf+sss;
+    const savings = parseFloat(document.getElementById('savingsAmount').value);
     return {
       date: document.getElementById('entryDate').value,
       netPay: isNaN(net) ? 0 : net,
@@ -512,7 +518,7 @@
       amortization: parseFloat(document.getElementById('amortization').value)||0,
       carFixed: parseFloat(document.getElementById('carFixed').value)||0,
       mp2Amount: parseFloat(document.getElementById('mp2Amount').value)||0,
-      savingsAmount: parseFloat(document.getElementById('savingsAmount').value) || Math.round((net*0.15)/100)*100,
+      savingsAmount: isNaN(savings) ? getDefaultSavings() : savings,
       electric: parseFloat(document.getElementById('electric').value)||0,
       waterHoa: parseFloat(document.getElementById('waterHoa').value)||0,
       internet: parseFloat(document.getElementById('internet').value)||0,
@@ -524,7 +530,6 @@
     const data = getFormData();
     if(!data.date){alert('Select date');return;}
     if(data.netPay<=0){alert('Please enter a valid Net Pay amount.');return;}
-    if (data.savingsAmount === undefined || isNaN(data.savingsAmount) || data.savingsAmount===0) data.savingsAmount = Math.round((data.netPay * 0.15) / 100) * 100;
     const editId = document.getElementById('editId').value;
     if(editId){
       const idx = entries.findIndex(e=>e.id==editId);
@@ -566,7 +571,6 @@
             const val = parseFloat(row[dockagesIdx]);
             if (!isNaN(val)) dockagesValue = val;
           }
-          const savings = Math.round((takeHome * 0.15) / 100) * 100;
           newEntries.push({
             id: Date.now() + i + Math.random(),
             date: formattedDate,
@@ -574,7 +578,7 @@
             dockages: dockagesValue,
             mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
             amortization: 9500, carFixed: 2500, mp2Amount: 2500,
-            savingsAmount: savings,
+            savingsAmount: getDefaultSavings(),
             electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
           });
         }
