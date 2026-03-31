@@ -182,7 +182,7 @@
       <div class="table-wrapper">
         <table class="entries-table">
           <thead>
-             <tr>
+              <tr>
                 <th>Date</th>
                 <th>Gross Income</th>
                 <th>Dockages</th>
@@ -276,8 +276,8 @@
   let entries = [], annualData = [], investments = [], currentYearFilter = 'all';
 
   // Helper to compute default savings based on basic pay (rounded to nearest hundred)
-  function getDefaultSavings() {
-    return Math.round((fixedIncome.basic * 0.15) / 100) * 100;
+  function getDefaultSavings(basic = fixedIncome.basic) {
+    return Math.round((basic * 0.15) / 100) * 100;
   }
 
   // ---------- ANNUAL ----------
@@ -360,7 +360,7 @@
         dockages: 0,
         mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
         amortization: 9500, carFixed: 2500, mp2Amount: 2500,
-        savingsAmount: getDefaultSavings(),
+        savingsAmount: getDefaultSavings(fixedIncome.basic),
         electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
       }];
       saveEntries();
@@ -539,7 +539,7 @@
   }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){ entries=[]; saveEntries(); updateYearFilterOptions(); renderEntriesTable(); clearForm(); } }
 
-  // ---------- EXCEL IMPORT (assumes header row 1) ----------
+  // ---------- EXCEL IMPORT (reads Basic Salary and computes savings per row) ----------
   async function parseExcelToEntries(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -553,6 +553,7 @@
         const periodIdx = headers.findIndex(h => h === "period");
         const takeHomeIdx = headers.findIndex(h => h === "take home pay");
         const dockagesIdx = headers.findIndex(h => h === "dockages");
+        const basicSalaryIdx = headers.findIndex(h => h === "basic salary");
         if (periodIdx === -1) reject("Period column not found");
         const newEntries = [];
         for (let i=1; i<rows.length; i++) {
@@ -571,6 +572,14 @@
             const val = parseFloat(row[dockagesIdx]);
             if (!isNaN(val)) dockagesValue = val;
           }
+          // Read basic salary for this row
+          let basicSalary = fixedIncome.basic; // fallback to global
+          if (basicSalaryIdx !== -1) {
+            const bs = parseFloat(row[basicSalaryIdx]);
+            if (!isNaN(bs) && bs > 0) basicSalary = bs;
+          }
+          // Compute savings as 15% of basic salary (rounded to nearest hundred)
+          const savings = Math.round((basicSalary * 0.15) / 100) * 100;
           newEntries.push({
             id: Date.now() + i + Math.random(),
             date: formattedDate,
@@ -578,7 +587,7 @@
             dockages: dockagesValue,
             mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
             amortization: 9500, carFixed: 2500, mp2Amount: 2500,
-            savingsAmount: getDefaultSavings(),
+            savingsAmount: savings,
             electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
           });
         }
