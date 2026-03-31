@@ -194,10 +194,10 @@
         </div>
         <div class="section-title">🏛️ Government Deductions</div>
         <div class="form-grid">
-          <div class="input-field"><label>MPF</label><input type="number" id="mpf" step="0.01" value="0"></div>
-          <div class="input-field"><label>PhilHealth</label><input type="number" id="philhealth" step="0.01" value="0"></div>
-          <div class="input-field"><label>HDMF (Pag-IBIG)</label><input type="number" id="hdmf" step="0.01" value="0"></div>
-          <div class="input-field"><label>SSS</label><input type="number" id="sss" step="0.01" value="0"></div>
+          <div class="input-field"><label>MPF</label><input type="number" id="mpf" step="0.01" value="750"></div>
+          <div class="input-field"><label>PhilHealth</label><input type="number" id="philhealth" step="0.01" value="1863"></div>
+          <div class="input-field"><label>HDMF (Pag-IBIG)</label><input type="number" id="hdmf" step="0.01" value="200"></div>
+          <div class="input-field"><label>SSS</label><input type="number" id="sss" step="0.01" value="1000"></div>
         </div>
         <div class="section-title">💰 Fixed Expenses</div>
         <div class="form-grid">
@@ -230,7 +230,7 @@
       <div class="table-wrapper">
         <table class="entries-table">
           <thead>
-            <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th></tr>
+             <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th></tr>
           </thead>
           <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
           <tfoot id="entriesFoot"></tfoot>
@@ -481,13 +481,13 @@
 
   function getEntryNetPay(entry) { return entry.netPay !== undefined ? entry.netPay : 0; }
   function computeEntrySavings(entry) { return entry.savingsAmount || 0; }
-  function computeEntryAmortization(entry) { return entry.amortization || 0; }  // show only amortization
+  function computeEntryAmortization(entry) { return entry.amortization || 0; }
   function computeEntryMP2(e) { return e.mp2Amount||0; }
   function computeEntryDeductions(e) { return e.totalDeductions !== undefined ? e.totalDeductions : ((e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0)); }
   function computeEntryRemainingAfter(e) {
     const net = getEntryNetPay(e);
     const savings = computeEntrySavings(e);
-    const amort = (e.amortization||0) + (e.carFixed||0);  // subtract both for net surplus
+    const amort = (e.amortization||0) + (e.carFixed||0);
     const mp2 = computeEntryMP2(e);
     const varExp = (e.electric||0)+(e.waterHoa||0)+(e.internet||0)+(e.mealExpense||0)+(e.grocery||0);
     return net - savings - amort - mp2 - varExp;
@@ -593,10 +593,10 @@
     document.getElementById('editId').value='';
     document.getElementById('entryDate').value=new Date().toISOString().slice(0,10);
     document.getElementById('actualNetPay').value='';
-    document.getElementById('mpf').value=0;
-    document.getElementById('philhealth').value=0;
-    document.getElementById('hdmf').value=0;
-    document.getElementById('sss').value=0;
+    document.getElementById('mpf').value=750;
+    document.getElementById('philhealth').value=1863;
+    document.getElementById('hdmf').value=200;
+    document.getElementById('sss').value=1000;
     document.getElementById('amortization').value=9500;
     document.getElementById('carFixed').value=2500;
     document.getElementById('mp2Amount').value=2500;
@@ -664,50 +664,58 @@
         const sheet = workbook.Sheets[workbook.SheetNames[0]];
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
         if(!rows || rows.length < 2) reject("No data found");
-        const headers = rows[0];
-        const colIndex = (name) => headers.findIndex(cell => String(cell).trim() === name);
-        const idxPeriod = colIndex("Period");
-        const idxTakeHome = colIndex("Take Home Pay");
-        const deductionCols = [
-          "MPF Employee Contribution",
-          "Phil Health Employee Contribution",
-          "HDMF Employee Contribution",
-          "SSS Employee Contribution",
-          "Leave without Pay",
-          "Tardiness",
-          "Tardiness Adjustment"
-        ];
-        const idxDeductions = deductionCols.map(name => colIndex(name));
-        if(idxPeriod === -1) reject("Period column not found");
-        const newEntries = [];
-        for(let i=1; i<rows.length; i++) {
-          const row = rows[i];
-          if(!row || row.length===0) continue;
-          let periodStr = row[idxPeriod];
-          if(!periodStr) continue;
-          let dateMatch = periodStr.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-          let dateStr = dateMatch ? dateMatch[1] : null;
-          if(!dateStr) continue;
-          let parts = dateStr.split('/');
-          let year = parseInt(parts[2]), month = parseInt(parts[0]), day = parseInt(parts[1]);
-          let dateObj = new Date(year, month-1, day);
-          let formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
-          let takeHome = parseFloat(row[idxTakeHome]) || 0;
-          if(takeHome===0) continue;
-          let totalDeductions = 0;
-          for (let idx of idxDeductions) {
-            if (idx !== -1) {
-              let val = parseFloat(row[idx]);
-              if (!isNaN(val)) totalDeductions += val;
+        const headers = rows[0].map(cell => String(cell).trim().toLowerCase());
+        // Flexible column matching
+        function findCol(keywords) {
+          for (let i = 0; i < headers.length; i++) {
+            const h = headers[i];
+            for (let kw of keywords) {
+              if (h.includes(kw.toLowerCase())) return i;
             }
           }
-          let savings = Math.round((takeHome * 0.15) / 100) * 100;
-          let newEntry = {
+          return -1;
+        }
+        const periodIdx = findCol(["period"]);
+        const takeHomeIdx = findCol(["take home pay", "take home"]);
+        if (periodIdx === -1) reject("Period column not found");
+        const deductionCols = [
+          { keywords: ["mpf", "mpf employee"] },
+          { keywords: ["phil health", "philhealth", "phil health employee"] },
+          { keywords: ["hdmf", "pag-ibig", "hdmf employee"] },
+          { keywords: ["sss", "sss employee"] },
+          { keywords: ["leave without pay", "leave"] },
+          { keywords: ["tardiness"] },
+          { keywords: ["tardiness adjustment", "tardiness adj"] }
+        ];
+        const deductionIndices = deductionCols.map(c => findCol(c.keywords));
+        const newEntries = [];
+        for (let i=1; i<rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length===0) continue;
+          const periodVal = row[periodIdx];
+          if (!periodVal) continue;
+          const dateMatch = String(periodVal).match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+          if (!dateMatch) continue;
+          const parts = dateMatch[1].split('/');
+          const year = parseInt(parts[2]), month = parseInt(parts[0])-1, day = parseInt(parts[1]);
+          const dateObj = new Date(year, month, day);
+          const formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
+          let takeHome = takeHomeIdx !== -1 ? (parseFloat(row[takeHomeIdx]) || 0) : 0;
+          if (takeHome === 0) continue;
+          let totalDed = 0;
+          for (let idx of deductionIndices) {
+            if (idx !== -1) {
+              const val = parseFloat(row[idx]);
+              if (!isNaN(val)) totalDed += val;
+            }
+          }
+          const savings = Math.round((takeHome * 0.15) / 100) * 100;
+          const newEntry = {
             id: Date.now() + i + Math.random(),
             date: formattedDate,
             netPay: takeHome,
-            totalDeductions: totalDeductions,
-            mpf: 0, philhealth: 0, hdmf: 0, sss: 0,  // individual values not stored separately, but total is
+            totalDeductions: totalDed,
+            mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
             amortization: 9500, carFixed: 2500, mp2Amount: 2500,
             savingsAmount: savings,
             electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
@@ -730,7 +738,7 @@
       if (!file) return;
       try {
         const newEntries = await parseExcelToEntries(file);
-        if(newEntries.length === 0) { alert('No valid pay periods found in Excel (missing Take Home Pay).'); return; }
+        if (newEntries.length === 0) { alert('No valid pay periods found in Excel (missing Take Home Pay).'); return; }
         entries.push(...newEntries);
         saveEntries();
         updateYearFilterOptions();
