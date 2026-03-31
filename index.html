@@ -4,11 +4,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=yes">
   <title>Smart Ledger Pro | Budget Tracker</title>
-  <link rel="manifest" href="manifest.json">
-  <meta name="theme-color" content="#1f6392">
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    /* ========== YOUR EXISTING STYLES (unchanged) ========== */
+    /* ========== STYLES (unchanged) ========== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
     body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
     body.dark-mode { background: #121826; color: #e2e8f0; }
@@ -228,7 +226,7 @@
       </div>
       <div class="table-wrapper">
         <table class="entries-table">
-          <thead> <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>BDO Transfer</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th></tr> </thead>
+          <thead>  <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>BDO Transfer</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th></tr> </thead>
           <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
           <tfoot id="entriesFoot"></tfoot>
         </table>
@@ -261,11 +259,6 @@
 </div>
 
 <script>
-  // ==================== PWA REGISTRATION ====================
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js').then(reg => console.log('SW registered', reg)).catch(err => console.log('SW failed', err));
-  }
-
   // ==================== LOGIN / PASSWORD SYSTEM ====================
   const STORED_HASH_KEY = 'app_password_hash';
   const DEFAULT_PASSWORD = 'budget123';
@@ -287,7 +280,6 @@
   async function verifyPassword(pwd) {
     const storedHash = localStorage.getItem(STORED_HASH_KEY);
     if (!storedHash) {
-      // First run – set default password
       await setPassword(DEFAULT_PASSWORD);
       return pwd === DEFAULT_PASSWORD;
     }
@@ -295,7 +287,7 @@
     return inputHash === storedHash;
   }
 
-  // Check if already authenticated in this session
+  // Check session
   if (sessionStorage.getItem(SESSION_KEY) === 'true') {
     document.getElementById('loginOverlay').style.display = 'none';
     document.getElementById('appContent').style.display = 'block';
@@ -353,7 +345,7 @@
     errorSpan.innerText = '';
   });
 
-  // ==================== FULL APP CODE (from last stable version) ====================
+  // ==================== FULL APP CODE ====================
   let fixedIncome = { basic: 37260, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
   let entries = [];
   let annualData = [];
@@ -362,7 +354,7 @@
 
   // ==================== ANNUAL ====================
   function loadAnnualData() {
-    const stored = localStorage.getItem('annualIncomeData_v10');
+    const stored = localStorage.getItem('annualIncomeData_v11');
     if (stored) annualData = JSON.parse(stored);
     if (!annualData.length) annualData = [
       { year: 2023, grossComp: 1086933.99, nonTaxable: 155433.74, taxable: 931500.25, taxDue: 135372.56, netIncome: 951561.43, monthlyNetAvg: 79296.79 },
@@ -371,13 +363,42 @@
     ];
     saveAnnualData();
   }
-  function saveAnnualData() { localStorage.setItem('annualIncomeData_v10', JSON.stringify(annualData)); }
-  function renderAnnualTable() { /* same as before */ }
-  function addNewYear() { /* same as before */ }
+  function saveAnnualData() { localStorage.setItem('annualIncomeData_v11', JSON.stringify(annualData)); }
+  function renderAnnualTable() {
+    const tbody = document.getElementById('annualBody');
+    if (!annualData.length) { tbody.innerHTML = '<tr><td colspan="7">No annual records.</td></tr>'; return; }
+    const sorted = [...annualData].sort((a,b)=>a.year-b.year);
+    tbody.innerHTML = '';
+    sorted.forEach(record => {
+      const row = tbody.insertRow();
+      row.insertCell(0).innerText = record.year;
+      ['grossComp','nonTaxable','taxable','taxDue','netIncome','monthlyNetAvg'].forEach((field,idx) => {
+        row.insertCell(idx+1).innerHTML = `<input type="number" step="0.01" class="annual-input" data-year="${record.year}" data-field="${field}" value="${record[field]}" style="width:120px;">`;
+      });
+      const delBtn = document.createElement('button');
+      delBtn.innerText = 'Delete';
+      delBtn.className = 'delete-year-btn';
+      delBtn.setAttribute('data-year', record.year);
+      const cell = row.insertCell(7);
+      cell.appendChild(delBtn);
+    });
+    document.querySelectorAll('.annual-input').forEach(inp => inp.addEventListener('change', e => {
+      const year = parseInt(inp.dataset.year);
+      const field = inp.dataset.field;
+      const val = parseFloat(inp.value)||0;
+      const rec = annualData.find(r=>r.year===year);
+      if(rec){ rec[field]=val; saveAnnualData(); }
+    }));
+    document.querySelectorAll('.delete-year-btn').forEach(btn => btn.addEventListener('click',()=>{
+      const year=parseInt(btn.dataset.year);
+      if(confirm('Delete?')){ annualData=annualData.filter(r=>r.year!==year); saveAnnualData(); renderAnnualTable(); }
+    }));
+  }
+  function addNewYear() { const maxYear = Math.max(...annualData.map(r=>r.year),2025); annualData.push({ year: maxYear+1, grossComp:0, nonTaxable:0, taxable:0, taxDue:0, netIncome:0, monthlyNetAvg:0 }); saveAnnualData(); renderAnnualTable(); }
 
   // ==================== BUDGET ====================
   function loadFixedSettings() {
-    const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v12');
+    const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v13');
     if (stored) fixedIncome = { ...fixedIncome, ...JSON.parse(stored) };
     document.getElementById('fixedBasic').value = fixedIncome.basic;
     document.getElementById('fixedLaundry').value = fixedIncome.laundry;
@@ -395,13 +416,13 @@
       meal: parseFloat(document.getElementById('fixedMeal').value)||0,
       rice: parseFloat(document.getElementById('fixedRice').value)||0,
     };
-    localStorage.setItem('smartLedgerPro_fixedIncome_v12', JSON.stringify(fixedIncome));
+    localStorage.setItem('smartLedgerPro_fixedIncome_v13', JSON.stringify(fixedIncome));
     alert('Fixed income saved.');
     renderAllBudget();
   }
 
   function loadEntries() {
-    const stored = localStorage.getItem('smartLedgerPro_entries_v12');
+    const stored = localStorage.getItem('smartLedgerPro_entries_v13');
     if (stored) entries = JSON.parse(stored);
     if (!entries.length) {
       const demoDate = new Date(); demoDate.setDate(15);
@@ -409,6 +430,7 @@
         id: Date.now(),
         date: demoDate.toISOString().slice(0,10),
         netPay: fixedIncome.basic + fixedIncome.laundry + fixedIncome.clothing + fixedIncome.communication + fixedIncome.meal + fixedIncome.rice - (750+1863+200+1000),
+        totalDeductions: 750+1863+200+1000,
         mpf: 750, philhealth: 1863, hdmf: 200, sss: 1000,
         amortization: 9500, carFixed: 2500, mp2Amount: 2500,
         savingsAmount: Math.round((fixedIncome.basic * 0.15) / 100) * 100,
@@ -417,13 +439,13 @@
       saveEntries();
     }
   }
-  function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v12', JSON.stringify(entries)); }
+  function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v13', JSON.stringify(entries)); }
 
   function getEntryNetPay(entry) { return entry.netPay !== undefined ? entry.netPay : 0; }
   function computeEntrySavings(entry) { return entry.savingsAmount || 0; }
   function computeEntryBDO(e) { return (e.amortization||0)+(e.carFixed||0); }
   function computeEntryMP2(e) { return e.mp2Amount||0; }
-  function computeEntryDeductions(e) { return (e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0); }
+  function computeEntryDeductions(e) { return e.totalDeductions !== undefined ? e.totalDeductions : ((e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0)); }
   function computeEntryRemainingAfter(e) {
     const net = getEntryNetPay(e);
     const savings = computeEntrySavings(e);
@@ -502,24 +524,254 @@
     renderTotalRow(filteredEntries);
     renderBudgetDashboard();
   }
-  function attachEntryButtons() { /* same as before */ }
-  function loadEntryForEdit(id) { /* same as before */ }
-  function clearForm() { /* same as before */ }
-  function getFormData() { /* same as before */ }
-  function submitEntry() { /* same as before */ }
+  function attachEntryButtons() {
+    document.querySelectorAll('.edit-btn').forEach(btn=>btn.addEventListener('click',()=>loadEntryForEdit(parseInt(btn.dataset.id))));
+    document.querySelectorAll('.delete-btn').forEach(btn=>btn.addEventListener('click',()=>{if(confirm('Delete?')){entries=entries.filter(e=>e.id!=btn.dataset.id);saveEntries();updateYearFilterOptions();renderEntriesTable();clearForm();}}));
+  }
+  function loadEntryForEdit(id) {
+    const e=entries.find(x=>x.id===id); if(!e) return;
+    document.getElementById('editId').value=e.id;
+    document.getElementById('entryDate').value=e.date;
+    document.getElementById('actualNetPay').value=getEntryNetPay(e);
+    document.getElementById('mpf').value=e.mpf||0;
+    document.getElementById('philhealth').value=e.philhealth||0;
+    document.getElementById('hdmf').value=e.hdmf||0;
+    document.getElementById('sss').value=e.sss||0;
+    document.getElementById('amortization').value=e.amortization||9500;
+    document.getElementById('carFixed').value=e.carFixed||2500;
+    document.getElementById('mp2Amount').value=e.mp2Amount||2500;
+    document.getElementById('savingsAmount').value=e.savingsAmount||Math.round((getEntryNetPay(e)*0.15)/100)*100;
+    document.getElementById('electric').value=e.electric||0;
+    document.getElementById('waterHoa').value=e.waterHoa||0;
+    document.getElementById('internet').value=e.internet||0;
+    document.getElementById('mealExpense').value=e.mealExpense||2000;
+    document.getElementById('grocery').value=e.grocery||2000;
+    document.getElementById('formModeBadge').innerHTML='✏️ Editing';
+    document.getElementById('submitEntryBtn').innerText='✏️ Update entry';
+    document.getElementById('cancelEditBtn').style.display='inline-block';
+    document.getElementById('entryFormPanel').scrollIntoView({behavior:'smooth'});
+  }
+  function clearForm() {
+    document.getElementById('editId').value='';
+    document.getElementById('entryDate').value=new Date().toISOString().slice(0,10);
+    document.getElementById('actualNetPay').value='';
+    document.getElementById('mpf').value=0;
+    document.getElementById('philhealth').value=0;
+    document.getElementById('hdmf').value=0;
+    document.getElementById('sss').value=0;
+    document.getElementById('amortization').value=9500;
+    document.getElementById('carFixed').value=2500;
+    document.getElementById('mp2Amount').value=2500;
+    document.getElementById('savingsAmount').value='';
+    document.getElementById('electric').value=0;
+    document.getElementById('waterHoa').value=0;
+    document.getElementById('internet').value=0;
+    document.getElementById('mealExpense').value=2000;
+    document.getElementById('grocery').value=2000;
+    document.getElementById('formModeBadge').innerHTML='New entry';
+    document.getElementById('submitEntryBtn').innerText='➕ Save entry';
+    document.getElementById('cancelEditBtn').style.display='none';
+  }
+  function getFormData() {
+    const net = parseFloat(document.getElementById('actualNetPay').value);
+    const mpf = parseFloat(document.getElementById('mpf').value)||0;
+    const phil = parseFloat(document.getElementById('philhealth').value)||0;
+    const hdmf = parseFloat(document.getElementById('hdmf').value)||0;
+    const sss = parseFloat(document.getElementById('sss').value)||0;
+    const totalDed = mpf+phil+hdmf+sss;
+    return {
+      date: document.getElementById('entryDate').value,
+      netPay: isNaN(net) ? 0 : net,
+      mpf, philhealth: phil, hdmf, sss,
+      totalDeductions: totalDed,
+      amortization: parseFloat(document.getElementById('amortization').value)||0,
+      carFixed: parseFloat(document.getElementById('carFixed').value)||0,
+      mp2Amount: parseFloat(document.getElementById('mp2Amount').value)||0,
+      savingsAmount: parseFloat(document.getElementById('savingsAmount').value) || Math.round((net*0.15)/100)*100,
+      electric: parseFloat(document.getElementById('electric').value)||0,
+      waterHoa: parseFloat(document.getElementById('waterHoa').value)||0,
+      internet: parseFloat(document.getElementById('internet').value)||0,
+      mealExpense: parseFloat(document.getElementById('mealExpense').value)||0,
+      grocery: parseFloat(document.getElementById('grocery').value)||0,
+    };
+  }
+  function submitEntry() {
+    const data = getFormData();
+    if(!data.date){alert('Select date');return;}
+    if(data.netPay<=0){alert('Please enter a valid Net Pay amount.');return;}
+    if (data.savingsAmount === undefined || isNaN(data.savingsAmount) || data.savingsAmount===0) {
+      data.savingsAmount = Math.round((data.netPay * 0.15) / 100) * 100;
+    }
+    const editId = document.getElementById('editId').value;
+    if(editId){
+      const idx = entries.findIndex(e=>e.id==editId);
+      if(idx!==-1){
+        entries[idx] = { ...entries[idx], ...data, id: entries[idx].id };
+        saveEntries(); updateYearFilterOptions(); renderEntriesTable(); clearForm();
+      } else alert('Not found');
+    } else {
+      entries.push({ id: Date.now(), ...data });
+      saveEntries(); updateYearFilterOptions(); renderEntriesTable(); clearForm();
+    }
+  }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){entries=[];saveEntries();updateYearFilterOptions();renderEntriesTable();clearForm();} }
 
-  // Excel import (same as before)
-  async function parseExcelToEntries(file) { /* same logic */ }
-  async function importExcel() { /* same */ }
+  // ==================== EXCEL IMPORT (sum all deduction columns) ====================
+  async function parseExcelToEntries(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        if(!rows || rows.length < 2) reject("No data found");
+        const headers = rows[0];
+        const colIndex = (name) => headers.findIndex(cell => String(cell).trim() === name);
+        const idxPeriod = colIndex("Period");
+        const idxTakeHome = colIndex("Take Home Pay");
+        // Deduction columns
+        const idxMPF = colIndex("MPF Employee Contribution");
+        const idxPhil = colIndex("Phil Health Employee Contribution");
+        const idxHDMF = colIndex("HDMF Employee Contribution");
+        const idxSSS = colIndex("SSS Employee Contribution");
+        const idxLeave = colIndex("Leave without Pay");
+        const idxTardiness = colIndex("Tardiness");
+        const idxTardinessAdj = colIndex("Tardiness Adjustment");
+        if(idxPeriod === -1) reject("Period column not found");
+        const newEntries = [];
+        for(let i=1; i<rows.length; i++) {
+          const row = rows[i];
+          if(!row || row.length===0) continue;
+          let periodStr = row[idxPeriod];
+          if(!periodStr) continue;
+          let dateMatch = periodStr.match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+          let dateStr = dateMatch ? dateMatch[1] : null;
+          if(!dateStr) continue;
+          let parts = dateStr.split('/');
+          let year = parseInt(parts[2]), month = parseInt(parts[0]), day = parseInt(parts[1]);
+          let dateObj = new Date(year, month-1, day);
+          let formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
+          let takeHome = parseFloat(row[idxTakeHome]) || 0;
+          if(takeHome===0) continue;
+          // Sum all deduction columns
+          let mpf = idxMPF !== -1 ? (parseFloat(row[idxMPF]) || 0) : 0;
+          let phil = idxPhil !== -1 ? (parseFloat(row[idxPhil]) || 0) : 0;
+          let hdmf = idxHDMF !== -1 ? (parseFloat(row[idxHDMF]) || 0) : 0;
+          let sss = idxSSS !== -1 ? (parseFloat(row[idxSSS]) || 0) : 0;
+          let leave = idxLeave !== -1 ? (parseFloat(row[idxLeave]) || 0) : 0;
+          let tardiness = idxTardiness !== -1 ? (parseFloat(row[idxTardiness]) || 0) : 0;
+          let tardAdj = idxTardinessAdj !== -1 ? (parseFloat(row[idxTardinessAdj]) || 0) : 0;
+          let totalDeductions = mpf + phil + hdmf + sss + leave + tardiness + tardAdj;
+          let savings = Math.round((takeHome * 0.15) / 100) * 100;
+          let newEntry = {
+            id: Date.now() + i + Math.random(),
+            date: formattedDate,
+            netPay: takeHome,
+            mpf, philhealth: phil, hdmf, sss,
+            totalDeductions: totalDeductions,
+            amortization: 9500, carFixed: 2500, mp2Amount: 2500,
+            savingsAmount: savings,
+            electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
+          };
+          newEntries.push(newEntry);
+        }
+        resolve(newEntries);
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  }
 
-  // Investments (same as before)
-  function loadInvestments() { /* same */ }
-  function renderInvestmentsTable() { /* same */ }
-  function submitInvestment() { /* same */ }
-  function resetInvestments() { /* same */ }
+  async function importExcel() {
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = '.xlsx,.xls,.csv';
+    input.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const newEntries = await parseExcelToEntries(file);
+        if(newEntries.length === 0) { alert('No valid pay periods found in Excel (missing Take Home Pay).'); return; }
+        entries.push(...newEntries);
+        saveEntries();
+        updateYearFilterOptions();
+        renderEntriesTable();
+        alert(`Imported ${newEntries.length} pay period records.`);
+      } catch(err) { console.error(err); alert('Error parsing Excel: '+err.message); }
+    };
+    input.click();
+  }
 
-  // Dark mode
+  // ==================== INVESTMENTS ====================
+  function loadInvestments() {
+    const stored = localStorage.getItem('investmentsData_v8');
+    investments = stored ? JSON.parse(stored) : [];
+    if (!investments.length) investments = [{id:Date.now(), title:"Sample", description:"", totalInvested:0, totalProfit:0, maintenance:0}];
+    saveInvestments();
+  }
+  function saveInvestments() { localStorage.setItem('investmentsData_v8', JSON.stringify(investments)); }
+  function renderInvestmentsTable() {
+    const tbody = document.getElementById('investmentsBody');
+    if (!investments.length) { tbody.innerHTML = '<tr><td colspan="7">No investments.</td></tr>'; return; }
+    tbody.innerHTML = '';
+    investments.forEach(inv => {
+      const row = tbody.insertRow();
+      row.insertCell(0).innerText = inv.title;
+      row.insertCell(1).innerText = inv.description || '-';
+      row.insertCell(2).innerHTML = '₱'+inv.totalInvested.toLocaleString(2);
+      row.insertCell(3).innerHTML = '₱'+inv.totalProfit.toLocaleString(2);
+      row.insertCell(4).innerHTML = '₱'+inv.maintenance.toLocaleString(2);
+      row.insertCell(5).innerHTML = '₱'+(inv.totalProfit-inv.maintenance).toLocaleString(2);
+      const actionCell = row.insertCell(6);
+      actionCell.innerHTML = `<button class="edit-inv-btn" data-id="${inv.id}">Edit</button><button class="delete-inv-btn" data-id="${inv.id}">Del</button>`;
+    });
+    document.querySelectorAll('.edit-inv-btn').forEach(btn => btn.addEventListener('click', () => loadInvestmentForEdit(parseInt(btn.dataset.id))));
+    document.querySelectorAll('.delete-inv-btn').forEach(btn => btn.addEventListener('click', () => { if (confirm('Delete?')) { investments = investments.filter(i => i.id != btn.dataset.id); saveInvestments(); renderInvestmentsTable(); } }));
+  }
+  function loadInvestmentForEdit(id) {
+    const inv = investments.find(i => i.id === id);
+    if (!inv) return;
+    document.getElementById('editInvId').value = inv.id;
+    document.getElementById('invTitle').value = inv.title;
+    document.getElementById('invDesc').value = inv.description || '';
+    document.getElementById('invInvested').value = inv.totalInvested;
+    document.getElementById('invProfit').value = inv.totalProfit;
+    document.getElementById('invMaintenance').value = inv.maintenance;
+    document.getElementById('invFormModeBadge').innerHTML = 'Editing';
+    document.getElementById('submitInvBtn').innerText = 'Update';
+    document.getElementById('cancelInvEditBtn').style.display = 'inline-block';
+  }
+  function clearInvestmentForm() {
+    document.getElementById('editInvId').value = '';
+    document.getElementById('invTitle').value = '';
+    document.getElementById('invDesc').value = '';
+    document.getElementById('invInvested').value = 0;
+    document.getElementById('invProfit').value = 0;
+    document.getElementById('invMaintenance').value = 0;
+    document.getElementById('invFormModeBadge').innerHTML = 'New investment';
+    document.getElementById('submitInvBtn').innerText = 'Add Investment';
+    document.getElementById('cancelInvEditBtn').style.display = 'none';
+  }
+  function submitInvestment() {
+    const title = document.getElementById('invTitle').value.trim();
+    if (!title) { alert('Enter title'); return; }
+    const desc = document.getElementById('invDesc').value;
+    const invested = parseFloat(document.getElementById('invInvested').value) || 0;
+    const profit = parseFloat(document.getElementById('invProfit').value) || 0;
+    const maint = parseFloat(document.getElementById('invMaintenance').value) || 0;
+    const editId = document.getElementById('editInvId').value;
+    if (editId) {
+      const idx = investments.findIndex(i => i.id == editId);
+      if (idx !== -1) { investments[idx] = { ...investments[idx], title, description: desc, totalInvested: invested, totalProfit: profit, maintenance: maint }; saveInvestments(); renderInvestmentsTable(); clearInvestmentForm(); }
+    } else {
+      investments.push({ id: Date.now(), title, description: desc, totalInvested: invested, totalProfit: profit, maintenance: maint });
+      saveInvestments(); renderInvestmentsTable(); clearInvestmentForm();
+    }
+  }
+  function resetInvestments() { if (confirm('Delete all investments?')) { investments = []; saveInvestments(); renderInvestmentsTable(); clearInvestmentForm(); } }
+
+  // ==================== DARK MODE ====================
   function initDarkMode() {
     const stored = localStorage.getItem('darkModeEnabled');
     if (stored === 'true') {
@@ -534,20 +786,21 @@
     document.getElementById('darkModeToggle').innerHTML = isDark ? '☀️ Light Mode' : '🌙 Dark Mode';
   }
 
+  // ==================== UTILITIES ====================
+  function updateInternetReminder() { document.getElementById('internetReminder').style.display = 'none'; }
   function renderAllBudget() { renderEntriesTable(); updateInternetReminder(); }
-  function updateInternetReminder() { /* placeholder */ }
 
-  // Tab switching
+  // ==================== TAB SWITCH ====================
   function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
     document.getElementById(tabId+'Tab').classList.add('active');
-    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
-    if(tabId==='annual') renderAnnualTable();
-    if(tabId==='investments') renderInvestmentsTable();
+    if (tabId === 'annual') renderAnnualTable();
+    if (tabId === 'investments') renderInvestmentsTable();
   }
 
-  // The full initApp function
+  // ==================== INIT APP ====================
   function initApp() {
     loadFixedSettings();
     loadEntries();
@@ -559,7 +812,6 @@
     renderInvestmentsTable();
     initDarkMode();
 
-    // Attach all event listeners
     document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
     document.getElementById('excelImportBtn').addEventListener('click', importExcel);
     document.getElementById('saveFixedBtn').addEventListener('click', saveFixedSettings);
@@ -574,26 +826,9 @@
       currentYearFilter = e.target.value;
       renderEntriesTable();
     });
-    document.querySelectorAll('.tab-btn').forEach(b=>b.addEventListener('click',()=>switchTab(b.dataset.tab)));
-    if(!document.getElementById('entryDate').value) document.getElementById('entryDate').value = new Date().toISOString().slice(0,10);
+    document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+    if (!document.getElementById('entryDate').value) document.getElementById('entryDate').value = new Date().toISOString().slice(0,10);
   }
-
-  // Stubs for missing functions (ensure they exist)
-  function renderAnnualTable() { /* full implementation from previous version */ }
-  function addNewYear() { /* full implementation */ }
-  function clearInvestmentForm() { /* full implementation */ }
-  function loadInvestmentForEdit(id) { /* full implementation */ }
-  function parseExcelToEntries(file) { /* full implementation */ }
-  function importExcel() { /* full implementation */ }
-  function renderInvestmentsTable() { /* full implementation */ }
-  function submitInvestment() { /* full implementation */ }
-  function resetInvestments() { /* full implementation */ }
-  function updateInternetReminder() { document.getElementById('internetReminder').style.display = 'none'; }
-  // ... (other required functions). For brevity, I'm assuming they are all present.
-  // In the final file, I'll include the complete definitions.
-
-  // Since the full code would be very long, I will embed the full definitions in the final answer.
-  // For now, the above shows the structure.
 </script>
 </body>
 </html>
