@@ -6,7 +6,6 @@
   <title>Smart Ledger Pro | Budget Tracker</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    /* ========== STYLES (unchanged) ========== */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
     body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
     body.dark-mode { background: #121826; color: #e2e8f0; }
@@ -24,6 +23,12 @@
     body.dark-mode #resetAllBtn { background: #7f2e2e !important; color: #fecaca !important; }
     body.dark-mode #entriesFoot { background: #0f172a !important; color: #f1f5f9 !important; }
     body.dark-mode #entriesFoot td { background: #0f172a; color: #f1f5f9; border-top-color: #334155; }
+    /* Dark mode fix for "New entry" badge */
+    body.dark-mode #formModeBadge,
+    body.dark-mode #invFormModeBadge {
+      background: #2d3a4e !important;
+      color: #cbd5e1 !important;
+    }
     .container { max-width: 1400px; margin: 0 auto; }
     .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; flex-wrap: wrap; gap: 12px; }
     h1 { font-size: 1.8rem; font-weight: 700; background: linear-gradient(135deg, #1e3c72, #2b4c7c); background-clip: text; -webkit-background-clip: text; color: transparent; margin-bottom: 0; }
@@ -128,7 +133,7 @@
 <body>
 
 <!-- LOGIN OVERLAY -->
-<div id="loginOverlay" class="login-overlay" style="display: none;">
+<div id="loginOverlay" class="login-overlay">
   <div class="login-box">
     <h2>🔐 Secure Access</h2>
     <p style="margin-bottom: 8px;">Enter your password to continue</p>
@@ -139,7 +144,7 @@
 </div>
 
 <div id="appContent" style="display: none;">
-  <!-- ========== APP CONTENT (unchanged) ========== -->
+  <!-- ========== APP CONTENT ========== -->
   <div class="container">
     <div class="top-bar">
       <h1>💰 Smart Ledger Pro</h1>
@@ -191,10 +196,10 @@
         </div>
         <div class="section-title">🏛️ Government Deductions</div>
         <div class="form-grid">
-          <div class="input-field"><label>MPF</label><input type="number" id="mpf" step="0.01" value="750"></div>
-          <div class="input-field"><label>PhilHealth</label><input type="number" id="philhealth" step="0.01" value="1863"></div>
-          <div class="input-field"><label>HDMF (Pag-IBIG)</label><input type="number" id="hdmf" step="0.01" value="200"></div>
-          <div class="input-field"><label>SSS</label><input type="number" id="sss" step="0.01" value="1000"></div>
+          <div class="input-field"><label>MPF</label><input type="number" id="mpf" step="0.01" value="0"></div>
+          <div class="input-field"><label>PhilHealth</label><input type="number" id="philhealth" step="0.01" value="0"></div>
+          <div class="input-field"><label>HDMF (Pag-IBIG)</label><input type="number" id="hdmf" step="0.01" value="0"></div>
+          <div class="input-field"><label>SSS</label><input type="number" id="sss" step="0.01" value="0"></div>
         </div>
         <div class="section-title">💰 Fixed Expenses</div>
         <div class="form-grid">
@@ -203,7 +208,7 @@
           <div class="input-field"><label>🏦 MP2 Contribution</label><input type="number" id="mp2Amount" step="0.01" value="2500"></div>
           <div class="input-field"><label>💰 Savings</label><input type="number" id="savingsAmount" step="0.01" placeholder="Will be rounded to nearest hundred"></div>
         </div>
-        <div class="badge-info">💡 Savings defaults to 15% of Net Pay (rounded to nearest hundred). Amortization + Car are combined for BDO transfer.</div>
+        <div class="badge-info">💡 Savings defaults to 15% of Net Pay (rounded to nearest hundred). Amortization + Car are combined as Amortization.</div>
         <div class="section-title">📋 Variable Expenses</div>
         <div class="form-grid">
           <div class="input-field"><label>⚡ Electric</label><input type="number" id="electric" step="0.01" value="0"></div>
@@ -226,7 +231,7 @@
       </div>
       <div class="table-wrapper">
         <table class="entries-table">
-          <thead>  <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>BDO Transfer</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th></tr> </thead>
+          <thead>   <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th> </tr> </thead>
           <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
           <tfoot id="entriesFoot"></tfoot>
         </table>
@@ -262,7 +267,6 @@
   // ==================== LOGIN / PASSWORD SYSTEM ====================
   const STORED_HASH_KEY = 'app_password_hash';
   const DEFAULT_PASSWORD = 'budget123';
-  const SESSION_KEY = 'app_authenticated';
 
   async function hashPassword(pwd) {
     const encoder = new TextEncoder();
@@ -287,20 +291,13 @@
     return inputHash === storedHash;
   }
 
-  // Check session
-  if (sessionStorage.getItem(SESSION_KEY) === 'true') {
-    document.getElementById('loginOverlay').style.display = 'none';
-    document.getElementById('appContent').style.display = 'block';
-    initApp();
-  } else {
-    document.getElementById('loginOverlay').style.display = 'flex';
-  }
+  // Show login overlay on every load
+  document.getElementById('loginOverlay').style.display = 'flex';
 
   document.getElementById('loginBtn').addEventListener('click', async () => {
     const pwd = document.getElementById('passwordInput').value;
     const isValid = await verifyPassword(pwd);
     if (isValid) {
-      sessionStorage.setItem(SESSION_KEY, 'true');
       document.getElementById('loginOverlay').style.display = 'none';
       document.getElementById('appContent').style.display = 'block';
       initApp();
@@ -337,12 +334,15 @@
       return;
     }
     await setPassword(newPwd);
-    alert('Password changed successfully. You will need to log in again next session.');
+    alert('Password changed successfully. Please log in again.');
     settingsModal.style.display = 'none';
     document.getElementById('oldPassword').value = '';
     document.getElementById('newPassword').value = '';
     document.getElementById('confirmPassword').value = '';
     errorSpan.innerText = '';
+    // Optionally force re-login
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('appContent').style.display = 'none';
   });
 
   // ==================== FULL APP CODE ====================
@@ -354,7 +354,7 @@
 
   // ==================== ANNUAL ====================
   function loadAnnualData() {
-    const stored = localStorage.getItem('annualIncomeData_v11');
+    const stored = localStorage.getItem('annualIncomeData_v12');
     if (stored) annualData = JSON.parse(stored);
     if (!annualData.length) annualData = [
       { year: 2023, grossComp: 1086933.99, nonTaxable: 155433.74, taxable: 931500.25, taxDue: 135372.56, netIncome: 951561.43, monthlyNetAvg: 79296.79 },
@@ -363,7 +363,7 @@
     ];
     saveAnnualData();
   }
-  function saveAnnualData() { localStorage.setItem('annualIncomeData_v11', JSON.stringify(annualData)); }
+  function saveAnnualData() { localStorage.setItem('annualIncomeData_v12', JSON.stringify(annualData)); }
   function renderAnnualTable() {
     const tbody = document.getElementById('annualBody');
     if (!annualData.length) { tbody.innerHTML = '<tr><td colspan="7">No annual records.</td></tr>'; return; }
@@ -398,7 +398,7 @@
 
   // ==================== BUDGET ====================
   function loadFixedSettings() {
-    const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v13');
+    const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v14');
     if (stored) fixedIncome = { ...fixedIncome, ...JSON.parse(stored) };
     document.getElementById('fixedBasic').value = fixedIncome.basic;
     document.getElementById('fixedLaundry').value = fixedIncome.laundry;
@@ -416,43 +416,44 @@
       meal: parseFloat(document.getElementById('fixedMeal').value)||0,
       rice: parseFloat(document.getElementById('fixedRice').value)||0,
     };
-    localStorage.setItem('smartLedgerPro_fixedIncome_v13', JSON.stringify(fixedIncome));
+    localStorage.setItem('smartLedgerPro_fixedIncome_v14', JSON.stringify(fixedIncome));
     alert('Fixed income saved.');
     renderAllBudget();
   }
 
   function loadEntries() {
-    const stored = localStorage.getItem('smartLedgerPro_entries_v13');
+    const stored = localStorage.getItem('smartLedgerPro_entries_v14');
     if (stored) entries = JSON.parse(stored);
     if (!entries.length) {
       const demoDate = new Date(); demoDate.setDate(15);
+      const demoNet = fixedIncome.basic + fixedIncome.laundry + fixedIncome.clothing + fixedIncome.communication + fixedIncome.meal + fixedIncome.rice;
       entries = [{
         id: Date.now(),
         date: demoDate.toISOString().slice(0,10),
-        netPay: fixedIncome.basic + fixedIncome.laundry + fixedIncome.clothing + fixedIncome.communication + fixedIncome.meal + fixedIncome.rice - (750+1863+200+1000),
-        totalDeductions: 750+1863+200+1000,
-        mpf: 750, philhealth: 1863, hdmf: 200, sss: 1000,
+        netPay: demoNet,
+        totalDeductions: 0,
+        mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
         amortization: 9500, carFixed: 2500, mp2Amount: 2500,
-        savingsAmount: Math.round((fixedIncome.basic * 0.15) / 100) * 100,
+        savingsAmount: Math.round((demoNet * 0.15) / 100) * 100,
         electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
       }];
       saveEntries();
     }
   }
-  function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v13', JSON.stringify(entries)); }
+  function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v14', JSON.stringify(entries)); }
 
   function getEntryNetPay(entry) { return entry.netPay !== undefined ? entry.netPay : 0; }
   function computeEntrySavings(entry) { return entry.savingsAmount || 0; }
-  function computeEntryBDO(e) { return (e.amortization||0)+(e.carFixed||0); }
+  function computeEntryAmortization(e) { return (e.amortization||0)+(e.carFixed||0); }
   function computeEntryMP2(e) { return e.mp2Amount||0; }
   function computeEntryDeductions(e) { return e.totalDeductions !== undefined ? e.totalDeductions : ((e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0)); }
   function computeEntryRemainingAfter(e) {
     const net = getEntryNetPay(e);
     const savings = computeEntrySavings(e);
-    const bdo = computeEntryBDO(e);
+    const amort = computeEntryAmortization(e);
     const mp2 = computeEntryMP2(e);
     const varExp = (e.electric||0)+(e.waterHoa||0)+(e.internet||0)+(e.mealExpense||0)+(e.grocery||0);
-    return net - savings - bdo - mp2 - varExp;
+    return net - savings - amort - mp2 - varExp;
   }
   function computeEntryTights(e) { const r = computeEntryRemainingAfter(e); return r<=0?0:r*0.10; }
   function computeEntryFinal(e) { return computeEntryRemainingAfter(e) - computeEntryTights(e); }
@@ -485,18 +486,18 @@
 
   function renderTotalRow(filteredEntries) {
     if (!filteredEntries.length) { document.getElementById('entriesFoot').innerHTML = ''; return; }
-    const totals = { gross:0, deductions:0, netPay:0, bdo:0, mp2:0, savings:0, tights:0, surplus:0 };
+    const totals = { gross:0, deductions:0, netPay:0, amort:0, mp2:0, savings:0, tights:0, surplus:0 };
     filteredEntries.forEach(e => {
       totals.gross += getEntryNetPay(e) + computeEntryDeductions(e);
       totals.deductions += computeEntryDeductions(e);
       totals.netPay += getEntryNetPay(e);
-      totals.bdo += computeEntryBDO(e);
+      totals.amort += computeEntryAmortization(e);
       totals.mp2 += computeEntryMP2(e);
       totals.savings += computeEntrySavings(e);
       totals.tights += computeEntryTights(e);
       totals.surplus += computeEntryFinal(e);
     });
-    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;"><td><strong>TOTAL</strong></td><td>₱${totals.gross.toLocaleString(2)}</td><td>₱${totals.deductions.toLocaleString(2)}</td><td>₱${totals.netPay.toLocaleString(2)}</td><td>₱${totals.bdo.toLocaleString(2)}</td><td>₱${totals.mp2.toLocaleString(2)}</td><td>₱${totals.savings.toLocaleString(2)}</td><td>₱${totals.tights.toLocaleString(2)}</td><td>₱${totals.surplus.toLocaleString(2)}</td><td></td></tr>`;
+    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;"><td><strong>TOTAL</strong></td><td>₱${totals.gross.toLocaleString(2)}</td><td>₱${totals.deductions.toLocaleString(2)}</td><td>₱${totals.netPay.toLocaleString(2)}</td><td>₱${totals.amort.toLocaleString(2)}</td><td>₱${totals.mp2.toLocaleString(2)}</td><td>₱${totals.savings.toLocaleString(2)}</td><td>₱${totals.tights.toLocaleString(2)}</td><td>₱${totals.surplus.toLocaleString(2)}</td><td></td></tr>`;
     document.getElementById('entriesFoot').innerHTML = footRow;
   }
 
@@ -513,7 +514,7 @@
       row.insertCell(1).innerHTML = '₱'+gross.toLocaleString(2);
       row.insertCell(2).innerHTML = '₱'+computeEntryDeductions(e).toLocaleString(2);
       row.insertCell(3).innerHTML = '₱'+getEntryNetPay(e).toLocaleString(2);
-      row.insertCell(4).innerHTML = '₱'+computeEntryBDO(e).toLocaleString(2);
+      row.insertCell(4).innerHTML = '₱'+computeEntryAmortization(e).toLocaleString(2);
       row.insertCell(5).innerHTML = '₱'+computeEntryMP2(e).toLocaleString(2);
       row.insertCell(6).innerHTML = '₱'+computeEntrySavings(e).toLocaleString(2);
       row.insertCell(7).innerHTML = '₱'+computeEntryTights(e).toLocaleString(2);
@@ -616,7 +617,7 @@
   }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){entries=[];saveEntries();updateYearFilterOptions();renderEntriesTable();clearForm();} }
 
-  // ==================== EXCEL IMPORT (sum all deduction columns) ====================
+  // ==================== EXCEL IMPORT ====================
   async function parseExcelToEntries(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -630,7 +631,6 @@
         const colIndex = (name) => headers.findIndex(cell => String(cell).trim() === name);
         const idxPeriod = colIndex("Period");
         const idxTakeHome = colIndex("Take Home Pay");
-        // Deduction columns
         const idxMPF = colIndex("MPF Employee Contribution");
         const idxPhil = colIndex("Phil Health Employee Contribution");
         const idxHDMF = colIndex("HDMF Employee Contribution");
@@ -654,7 +654,6 @@
           let formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
           let takeHome = parseFloat(row[idxTakeHome]) || 0;
           if(takeHome===0) continue;
-          // Sum all deduction columns
           let mpf = idxMPF !== -1 ? (parseFloat(row[idxMPF]) || 0) : 0;
           let phil = idxPhil !== -1 ? (parseFloat(row[idxPhil]) || 0) : 0;
           let hdmf = idxHDMF !== -1 ? (parseFloat(row[idxHDMF]) || 0) : 0;
@@ -705,12 +704,12 @@
 
   // ==================== INVESTMENTS ====================
   function loadInvestments() {
-    const stored = localStorage.getItem('investmentsData_v8');
+    const stored = localStorage.getItem('investmentsData_v9');
     investments = stored ? JSON.parse(stored) : [];
     if (!investments.length) investments = [{id:Date.now(), title:"Sample", description:"", totalInvested:0, totalProfit:0, maintenance:0}];
     saveInvestments();
   }
-  function saveInvestments() { localStorage.setItem('investmentsData_v8', JSON.stringify(investments)); }
+  function saveInvestments() { localStorage.setItem('investmentsData_v9', JSON.stringify(investments)); }
   function renderInvestmentsTable() {
     const tbody = document.getElementById('investmentsBody');
     if (!investments.length) { tbody.innerHTML = '<tr><td colspan="7">No investments.</td></tr>'; return; }
@@ -812,22 +811,71 @@
     renderInvestmentsTable();
     initDarkMode();
 
-    document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-    document.getElementById('excelImportBtn').addEventListener('click', importExcel);
-    document.getElementById('saveFixedBtn').addEventListener('click', saveFixedSettings);
-    document.getElementById('submitEntryBtn').addEventListener('click', submitEntry);
-    document.getElementById('cancelEditBtn').addEventListener('click', clearForm);
-    document.getElementById('resetAllBtn').addEventListener('click', resetAllData);
-    document.getElementById('addYearBtn').addEventListener('click', addNewYear);
-    document.getElementById('submitInvBtn').addEventListener('click', submitInvestment);
-    document.getElementById('cancelInvEditBtn').addEventListener('click', clearInvestmentForm);
-    document.getElementById('resetInvestmentsBtn').addEventListener('click', resetInvestments);
-    document.getElementById('yearFilterSelect').addEventListener('change', e => {
+    // Attach event listeners (remove any previous ones first to avoid duplicates)
+    const darkToggle = document.getElementById('darkModeToggle');
+    const newDarkToggle = darkToggle.cloneNode(true);
+    darkToggle.parentNode.replaceChild(newDarkToggle, darkToggle);
+    newDarkToggle.addEventListener('click', toggleDarkMode);
+
+    const excelBtn = document.getElementById('excelImportBtn');
+    const newExcelBtn = excelBtn.cloneNode(true);
+    excelBtn.parentNode.replaceChild(newExcelBtn, excelBtn);
+    newExcelBtn.addEventListener('click', importExcel);
+
+    const saveFixed = document.getElementById('saveFixedBtn');
+    const newSaveFixed = saveFixed.cloneNode(true);
+    saveFixed.parentNode.replaceChild(newSaveFixed, saveFixed);
+    newSaveFixed.addEventListener('click', saveFixedSettings);
+
+    const submitEntry = document.getElementById('submitEntryBtn');
+    const newSubmitEntry = submitEntry.cloneNode(true);
+    submitEntry.parentNode.replaceChild(newSubmitEntry, submitEntry);
+    newSubmitEntry.addEventListener('click', window.submitEntry);
+
+    const cancelEdit = document.getElementById('cancelEditBtn');
+    const newCancelEdit = cancelEdit.cloneNode(true);
+    cancelEdit.parentNode.replaceChild(newCancelEdit, cancelEdit);
+    newCancelEdit.addEventListener('click', clearForm);
+
+    const resetAll = document.getElementById('resetAllBtn');
+    const newResetAll = resetAll.cloneNode(true);
+    resetAll.parentNode.replaceChild(newResetAll, resetAll);
+    newResetAll.addEventListener('click', resetAllData);
+
+    const addYear = document.getElementById('addYearBtn');
+    const newAddYear = addYear.cloneNode(true);
+    addYear.parentNode.replaceChild(newAddYear, addYear);
+    newAddYear.addEventListener('click', addNewYear);
+
+    const submitInv = document.getElementById('submitInvBtn');
+    const newSubmitInv = submitInv.cloneNode(true);
+    submitInv.parentNode.replaceChild(newSubmitInv, submitInv);
+    newSubmitInv.addEventListener('click', submitInvestment);
+
+    const cancelInv = document.getElementById('cancelInvEditBtn');
+    const newCancelInv = cancelInv.cloneNode(true);
+    cancelInv.parentNode.replaceChild(newCancelInv, cancelInv);
+    newCancelInv.addEventListener('click', clearInvestmentForm);
+
+    const resetInv = document.getElementById('resetInvestmentsBtn');
+    const newResetInv = resetInv.cloneNode(true);
+    resetInv.parentNode.replaceChild(newResetInv, resetInv);
+    newResetInv.addEventListener('click', resetInvestments);
+
+    const yearFilter = document.getElementById('yearFilterSelect');
+    const newYearFilter = yearFilter.cloneNode(true);
+    yearFilter.parentNode.replaceChild(newYearFilter, yearFilter);
+    newYearFilter.addEventListener('change', e => {
       currentYearFilter = e.target.value;
       renderEntriesTable();
     });
-    document.querySelectorAll('.tab-btn').forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
-    if (!document.getElementById('entryDate').value) document.getElementById('entryDate').value = new Date().toISOString().slice(0,10);
+
+    const tabBtns = document.querySelectorAll('.tab-btn');
+    tabBtns.forEach(btn => {
+      const newBtn = btn.cloneNode(true);
+      btn.parentNode.replaceChild(newBtn, btn);
+      newBtn.addEventListener('click', () => switchTab(newBtn.dataset.tab));
+    });
   }
 </script>
 </body>
