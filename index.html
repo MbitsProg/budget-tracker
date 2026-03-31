@@ -6,7 +6,7 @@
   <title>Smart Ledger Pro | Budget Tracker</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    /* (All styles unchanged from previous working version) */
+    /* (Styles remain exactly as in the last working version) */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
     body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
     body.dark-mode { background: #121826; color: #e2e8f0; }
@@ -182,7 +182,7 @@
       <div class="table-wrapper">
         <table class="entries-table">
           <thead>
-            <tr>
+             <tr>
               <th>Date</th>
               <th>Gross Income</th>
               <th>Dockages</th>
@@ -193,7 +193,7 @@
               <th>Tights (10%)</th>
               <th>Net Surplus</th>
               <th>Actions</th>
-            </tr>
+             </tr>
           </thead>
           <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
           <tfoot id="entriesFoot"></tfoot>
@@ -201,9 +201,9 @@
       </div>
     </div>
 
-    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead> <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr> </thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead><tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr></thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
 
-    <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2></div><div class="table-wrapper"><table class="investments-table"><thead> <tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr> </thead><tbody id="investmentsBody"></tbody></table></div></div>
+    <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead><tbody id="investmentsBody"></tbody></table></div></div>
 
     <footer>📌 Internet bill reminder: ₱10,000/year due June 15. Reminder appears on May 30. All data saved locally.</footer>
   </div>
@@ -221,7 +221,7 @@
 </div>
 
 <script>
-  // ==================== LOGIN & PASSWORD ====================
+  // ==================== LOGIN & PASSWORD (unchanged) ====================
   const STORED_HASH_KEY = 'app_password_hash';
   const DEFAULT_PASSWORD = 'budget123';
 
@@ -275,9 +275,9 @@
   let fixedIncome = { basic: 37260, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
   let entries = [], annualData = [], investments = [], currentYearFilter = 'all';
 
-  // ---------- ANNUAL ----------
+  // ---------- ANNUAL (unchanged) ----------
   function loadAnnualData() {
-    const stored = localStorage.getItem('annualIncomeData_v14');
+    const stored = localStorage.getItem('annualIncomeData_v15');
     if (stored) annualData = JSON.parse(stored);
     if (!annualData.length) annualData = [
       { year: 2023, grossComp: 1086933.99, nonTaxable: 155433.74, taxable: 931500.25, taxDue: 135372.56, netIncome: 951561.43, monthlyNetAvg: 79296.79 },
@@ -286,7 +286,7 @@
     ];
     saveAnnualData();
   }
-  function saveAnnualData() { localStorage.setItem('annualIncomeData_v14', JSON.stringify(annualData)); }
+  function saveAnnualData() { localStorage.setItem('annualIncomeData_v15', JSON.stringify(annualData)); }
   function renderAnnualTable() {
     const tbody = document.getElementById('annualBody');
     if (!annualData.length) { tbody.innerHTML = '<tr><td colspan="7">No annual records.</td></tr>'; return; }
@@ -319,7 +319,7 @@
 
   // ---------- BUDGET ----------
   function loadFixedSettings() {
-    const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v16');
+    const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v17');
     if (stored) fixedIncome = { ...fixedIncome, ...JSON.parse(stored) };
     document.getElementById('fixedBasic').value = fixedIncome.basic;
     document.getElementById('fixedLaundry').value = fixedIncome.laundry;
@@ -337,13 +337,13 @@
       meal: parseFloat(document.getElementById('fixedMeal').value)||0,
       rice: parseFloat(document.getElementById('fixedRice').value)||0,
     };
-    localStorage.setItem('smartLedgerPro_fixedIncome_v16', JSON.stringify(fixedIncome));
+    localStorage.setItem('smartLedgerPro_fixedIncome_v17', JSON.stringify(fixedIncome));
     alert('Fixed income saved.');
     renderAllBudget();
   }
 
   function loadEntries() {
-    const stored = localStorage.getItem('smartLedgerPro_entries_v16');
+    const stored = localStorage.getItem('smartLedgerPro_entries_v17');
     if (stored) entries = JSON.parse(stored);
     if (!entries.length) {
       const demoDate = new Date(); demoDate.setDate(15);
@@ -361,7 +361,7 @@
       saveEntries();
     }
   }
-  function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v16', JSON.stringify(entries)); }
+  function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v17', JSON.stringify(entries)); }
 
   function getEntryNetPay(e) { return e.netPay !== undefined ? e.netPay : 0; }
   function computeEntrySavings(e) { return e.savingsAmount || 0; }
@@ -534,7 +534,7 @@
   }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){ entries=[]; saveEntries(); updateYearFilterOptions(); renderEntriesTable(); clearForm(); } }
 
-  // ---------- EXCEL IMPORT (sums all seven deduction columns into 'dockages') ----------
+  // ---------- EXCEL IMPORT (reads a column named "Dockages" directly) ----------
   async function parseExcelToEntries(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -558,17 +558,9 @@
         }
         const periodIdx = findCol(["period"]);
         const takeHomeIdx = findCol(["takehomepay", "takehome", "take home pay"]);
+        // Look for a column that contains "dockages" or "total deductions"
+        const dockagesIdx = findCol(["dockages", "totaldeductions", "total deductions", "dockages total"]);
         if (periodIdx === -1) reject("Period column not found");
-        const deductionPatterns = [
-          ["mpf", "mpfemployee"],
-          ["philhealth", "philhealthemployee", "phil health"],
-          ["hdmf", "pagibig", "hdmfemployee"],
-          ["sss", "sssemployee"],
-          ["leavewithoutpay", "leave"],
-          ["tardiness"],
-          ["tardinessadjustment", "tardinessadj"]
-        ];
-        const deductionIndices = deductionPatterns.map(p => findCol(p));
         const newEntries = [];
         for (let i=1; i<rows.length; i++) {
           const row = rows[i];
@@ -581,19 +573,18 @@
           const formattedDate = `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
           let takeHome = takeHomeIdx !== -1 ? (parseFloat(row[takeHomeIdx]) || 0) : 0;
           if (takeHome === 0) continue;
-          let totalDed = 0;
-          for (let idx of deductionIndices) {
-            if (idx !== -1) {
-              const val = parseFloat(row[idx]);
-              if (!isNaN(val)) totalDed += val;
-            }
+          // Get dockages value from the column if found; otherwise default to 0
+          let dockagesValue = 0;
+          if (dockagesIdx !== -1) {
+            const val = parseFloat(row[dockagesIdx]);
+            if (!isNaN(val)) dockagesValue = val;
           }
           const savings = Math.round((takeHome * 0.15) / 100) * 100;
           newEntries.push({
             id: Date.now() + i + Math.random(),
             date: formattedDate,
             netPay: takeHome,
-            dockages: totalDed,
+            dockages: dockagesValue,
             mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
             amortization: 9500, carFixed: 2500, mp2Amount: 2500,
             savingsAmount: savings,
@@ -616,7 +607,7 @@
       if (!file) return;
       try {
         const newEntries = await parseExcelToEntries(file);
-        if (newEntries.length === 0) { alert('No valid pay periods found (missing Take Home Pay).'); return; }
+        if (newEntries.length === 0) { alert('No valid pay periods found (missing Take Home Pay or Period).'); return; }
         entries.push(...newEntries);
         saveEntries();
         updateYearFilterOptions();
@@ -627,14 +618,14 @@
     input.click();
   }
 
-  // ---------- INVESTMENTS ----------
+  // ---------- INVESTMENTS (unchanged) ----------
   function loadInvestments() {
-    const stored = localStorage.getItem('investmentsData_v11');
+    const stored = localStorage.getItem('investmentsData_v12');
     investments = stored ? JSON.parse(stored) : [];
     if (!investments.length) investments = [{id:Date.now(), title:"Sample", description:"", totalInvested:0, totalProfit:0, maintenance:0}];
     saveInvestments();
   }
-  function saveInvestments() { localStorage.setItem('investmentsData_v11', JSON.stringify(investments)); }
+  function saveInvestments() { localStorage.setItem('investmentsData_v12', JSON.stringify(investments)); }
   function renderInvestmentsTable() {
     const tbody = document.getElementById('investmentsBody');
     if (!investments.length) { tbody.innerHTML = '<tr><td colspan="7">No investments.</td></tr>'; return; }
