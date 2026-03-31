@@ -548,7 +548,7 @@ async function parseExcelToEntries(file) {
       // Find column indices (case‑insensitive)
       const periodIdx = headers.findIndex(h => h.toLowerCase() === "period");
       const takeHomeIdx = headers.findIndex(h => h.toLowerCase() === "take home pay");
-      const dockagesIdx = headers.findIndex(h => h.toLowerCase() === "dockages");
+      const dockagesIdx = headers.findIndex(h => h.toLowerCase().includes("dockage"));
       if (periodIdx === -1) reject("Period column not found");
       const newEntries = [];
       for (let i=1; i<rows.length; i++) {
