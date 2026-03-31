@@ -6,7 +6,7 @@
   <title>Smart Ledger Pro | Budget Tracker</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    /* (Styles remain exactly as in the last working version) */
+    /* (All styles unchanged – same as last working version) */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
     body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
     body.dark-mode { background: #121826; color: #e2e8f0; }
@@ -182,18 +182,18 @@
       <div class="table-wrapper">
         <table class="entries-table">
           <thead>
-             <tr>
-              <th>Date</th>
-              <th>Gross Income</th>
-              <th>Dockages</th>
-              <th>Net Pay</th>
-              <th>Amortization</th>
-              <th>MP2</th>
-              <th>Savings</th>
-              <th>Tights (10%)</th>
-              <th>Net Surplus</th>
-              <th>Actions</th>
-             </tr>
+              <tr>
+                <th>Date</th>
+                <th>Gross Income</th>
+                <th>Dockages</th>
+                <th>Net Pay</th>
+                <th>Amortization</th>
+                <th>MP2</th>
+                <th>Savings</th>
+                <th>Tights (10%)</th>
+                <th>Net Surplus</th>
+                <th>Actions</th>
+              </tr>
           </thead>
           <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
           <tfoot id="entriesFoot"></tfoot>
@@ -221,7 +221,7 @@
 </div>
 
 <script>
-  // ==================== LOGIN & PASSWORD (unchanged) ====================
+  // ==================== LOGIN & PASSWORD ====================
   const STORED_HASH_KEY = 'app_password_hash';
   const DEFAULT_PASSWORD = 'budget123';
 
@@ -275,7 +275,7 @@
   let fixedIncome = { basic: 37260, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
   let entries = [], annualData = [], investments = [], currentYearFilter = 'all';
 
-  // ---------- ANNUAL (unchanged) ----------
+  // ---------- ANNUAL ----------
   function loadAnnualData() {
     const stored = localStorage.getItem('annualIncomeData_v15');
     if (stored) annualData = JSON.parse(stored);
@@ -411,17 +411,17 @@
       totals.surplus += computeEntryFinal(e);
     });
     const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">
-        <td><strong>TOTAL</strong></td>
-        <td>₱${totals.gross.toLocaleString(2)}</td>
-        <td>₱${totals.dockages.toLocaleString(2)}</td>
-        <td>₱${totals.netPay.toLocaleString(2)}</td>
-        <td>₱${totals.amort.toLocaleString(2)}</td>
-        <td>₱${totals.mp2.toLocaleString(2)}</td>
-        <td>₱${totals.savings.toLocaleString(2)}</td>
-        <td>₱${totals.tights.toLocaleString(2)}</td>
-        <td>₱${totals.surplus.toLocaleString(2)}</td>
-        <td></td>
-      </tr>`;
+         <td><strong>TOTAL</strong></td>
+         <td>₱${totals.gross.toLocaleString(2)}</td>
+         <td>₱${totals.dockages.toLocaleString(2)}</td>
+         <td>₱${totals.netPay.toLocaleString(2)}</td>
+         <td>₱${totals.amort.toLocaleString(2)}</td>
+         <td>₱${totals.mp2.toLocaleString(2)}</td>
+         <td>₱${totals.savings.toLocaleString(2)}</td>
+         <td>₱${totals.tights.toLocaleString(2)}</td>
+         <td>₱${totals.surplus.toLocaleString(2)}</td>
+         <td></td>
+       </tr>`;
     document.getElementById('entriesFoot').innerHTML = footRow;
   }
 
@@ -534,77 +534,56 @@
   }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){ entries=[]; saveEntries(); updateYearFilterOptions(); renderEntriesTable(); clearForm(); } }
 
-  // ---------- EXCEL IMPORT (reads a column named "Dockages" directly) ----------
-async function parseExcelToEntries(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = function(e) {
-      const data = new Uint8Array(e.target.result);
-      const workbook = XLSX.read(data, { type: 'array' });
-      const sheet = workbook.Sheets[workbook.SheetNames[0]];
-      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-      if(!rows || rows.length < 2) reject("No data found");
-
-      // Expected column names (case‑insensitive)
-      const expectedCols = ["period", "take home pay", "dockages"];
-
-      // Function to find the header row (look at first 5 rows)
-      let headerRowIndex = -1;
-      for (let i = 0; i < Math.min(5, rows.length); i++) {
-        const row = rows[i];
-        if (!row || row.length === 0) continue;
-        const rowHeaders = row.map(cell => String(cell).trim().toLowerCase());
-        // Check if this row contains at least one of the expected columns
-        const hasMatch = expectedCols.some(col => rowHeaders.some(h => h === col || h.includes(col)));
-        if (hasMatch) {
-          headerRowIndex = i;
-          break;
+  // ---------- EXCEL IMPORT (assumes header row 1) ----------
+  async function parseExcelToEntries(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const data = new Uint8Array(e.target.result);
+        const workbook = XLSX.read(data, { type: 'array' });
+        const sheet = workbook.Sheets[workbook.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+        if(!rows || rows.length < 2) reject("No data found");
+        const headers = rows[0].map(h => String(h).trim().toLowerCase());
+        const periodIdx = headers.findIndex(h => h === "period");
+        const takeHomeIdx = headers.findIndex(h => h === "take home pay");
+        const dockagesIdx = headers.findIndex(h => h === "dockages");
+        if (periodIdx === -1) reject("Period column not found");
+        const newEntries = [];
+        for (let i=1; i<rows.length; i++) {
+          const row = rows[i];
+          if (!row || row.length===0) continue;
+          const periodVal = row[periodIdx];
+          if (!periodVal) continue;
+          const dateMatch = String(periodVal).match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
+          if (!dateMatch) continue;
+          const [month, day, year] = dateMatch[1].split('/');
+          const formattedDate = `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
+          let takeHome = takeHomeIdx !== -1 ? (parseFloat(row[takeHomeIdx]) || 0) : 0;
+          if (takeHome === 0) continue;
+          let dockagesValue = 0;
+          if (dockagesIdx !== -1) {
+            const val = parseFloat(row[dockagesIdx]);
+            if (!isNaN(val)) dockagesValue = val;
+          }
+          const savings = Math.round((takeHome * 0.15) / 100) * 100;
+          newEntries.push({
+            id: Date.now() + i + Math.random(),
+            date: formattedDate,
+            netPay: takeHome,
+            dockages: dockagesValue,
+            mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
+            amortization: 9500, carFixed: 2500, mp2Amount: 2500,
+            savingsAmount: savings,
+            electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
+          });
         }
-      }
-      if (headerRowIndex === -1) reject("Could not find header row (missing Period, Take Home Pay, or Dockages)");
-
-      const headers = rows[headerRowIndex].map(h => String(h).trim().toLowerCase());
-      // Map column indices
-      const periodIdx = headers.findIndex(h => h === "period" || h.includes("period"));
-      const takeHomeIdx = headers.findIndex(h => h === "take home pay" || h.includes("take home pay") || h.includes("takehome"));
-      const dockagesIdx = headers.findIndex(h => h === "dockages" || h.includes("dockages"));
-      if (periodIdx === -1) reject("Period column not found");
-
-      const newEntries = [];
-      for (let i = headerRowIndex + 1; i < rows.length; i++) {
-        const row = rows[i];
-        if (!row || row.length === 0) continue;
-        const periodVal = row[periodIdx];
-        if (!periodVal) continue;
-        const dateMatch = String(periodVal).match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
-        if (!dateMatch) continue;
-        const [month, day, year] = dateMatch[1].split('/');
-        const formattedDate = `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
-        let takeHome = takeHomeIdx !== -1 ? (parseFloat(row[takeHomeIdx]) || 0) : 0;
-        if (takeHome === 0) continue;
-        let dockagesValue = 0;
-        if (dockagesIdx !== -1) {
-          const val = parseFloat(row[dockagesIdx]);
-          if (!isNaN(val)) dockagesValue = val;
-        }
-        const savings = Math.round((takeHome * 0.15) / 100) * 100;
-        newEntries.push({
-          id: Date.now() + i + Math.random(),
-          date: formattedDate,
-          netPay: takeHome,
-          dockages: dockagesValue,
-          mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
-          amortization: 9500, carFixed: 2500, mp2Amount: 2500,
-          savingsAmount: savings,
-          electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
-        });
-      }
-      resolve(newEntries);
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
-}
+        resolve(newEntries);
+      };
+      reader.onerror = reject;
+      reader.readAsArrayBuffer(file);
+    });
+  }
 
   async function importExcel() {
     const input = document.createElement('input');
