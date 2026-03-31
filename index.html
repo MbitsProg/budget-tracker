@@ -6,7 +6,7 @@
   <title>Smart Ledger Pro | Budget Tracker</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    /* (Styles unchanged – same as previous working version) */
+    /* (All styles remain exactly as before – no changes) */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
     body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
     body.dark-mode { background: #121826; color: #e2e8f0; }
@@ -181,14 +181,26 @@
       </div>
       <div class="table-wrapper">
         <table class="entries-table">
-          <thead>   <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th> </tr> </thead>
-          <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
+          <thead>
+             <tr>
+               <th>Date</th>
+               <th>Gross Income</th>
+               <th>Net Pay</th>
+               <th>Amortization</th>
+               <th>MP2</th>
+               <th>Savings</th>
+               <th>Tights (10%)</th>
+               <th>Net Surplus</th>
+               <th>Actions</th>
+             </tr>
+          </thead>
+          <tbody id="entriesBody"><tr><td colspan="9">No records. Add a manual entry or import Excel.</td></tr></tbody>
           <tfoot id="entriesFoot"></tfoot>
         </table>
       </div>
     </div>
 
-    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead><tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr></thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead>   <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr> </thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
 
     <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead><tbody id="investmentsBody"></tbody></table></div></div>
 
@@ -386,10 +398,9 @@
 
   function renderTotalRow(filteredEntries) {
     if (!filteredEntries.length) { document.getElementById('entriesFoot').innerHTML = ''; return; }
-    const totals = { gross:0, deductions:0, netPay:0, amort:0, mp2:0, savings:0, tights:0, surplus:0 };
+    const totals = { gross:0, netPay:0, amort:0, mp2:0, savings:0, tights:0, surplus:0 };
     filteredEntries.forEach(e => {
       totals.gross += getEntryNetPay(e) + computeEntryDeductions(e);
-      totals.deductions += computeEntryDeductions(e);
       totals.netPay += getEntryNetPay(e);
       totals.amort += computeEntryAmortization(e);
       totals.mp2 += computeEntryMP2(e);
@@ -397,14 +408,24 @@
       totals.tights += computeEntryTights(e);
       totals.surplus += computeEntryFinal(e);
     });
-    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;"><td><strong>TOTAL</strong></td><td>₱${totals.gross.toLocaleString(2)}</td><td>₱${totals.deductions.toLocaleString(2)}</td><td>₱${totals.netPay.toLocaleString(2)}</td><td>₱${totals.amort.toLocaleString(2)}</td><td>₱${totals.mp2.toLocaleString(2)}</td><td>₱${totals.savings.toLocaleString(2)}</td><td>₱${totals.tights.toLocaleString(2)}</td><td>₱${totals.surplus.toLocaleString(2)}</td><td></td></tr>`;
+    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">
+       <td><strong>TOTAL</strong></td>
+       <td>₱${totals.gross.toLocaleString(2)}</td>
+       <td>₱${totals.netPay.toLocaleString(2)}</td>
+       <td>₱${totals.amort.toLocaleString(2)}</td>
+       <td>₱${totals.mp2.toLocaleString(2)}</td>
+       <td>₱${totals.savings.toLocaleString(2)}</td>
+       <td>₱${totals.tights.toLocaleString(2)}</td>
+       <td>₱${totals.surplus.toLocaleString(2)}</td>
+       <td></td>
+     </tr>`;
     document.getElementById('entriesFoot').innerHTML = footRow;
   }
 
   function renderEntriesTable() {
     const filtered = currentYearFilter === 'all' ? entries : entries.filter(e => new Date(e.date).getFullYear() === parseInt(currentYearFilter));
     const tbody = document.getElementById('entriesBody');
-    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="10">No records for selected year.</td></tr>'; renderTotalRow([]); renderBudgetDashboard(); return; }
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="9">No records for selected year.</td></tr>'; renderTotalRow([]); renderBudgetDashboard(); return; }
     const sorted = [...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date));
     tbody.innerHTML = '';
     sorted.forEach(e => {
@@ -412,14 +433,13 @@
       row.insertCell(0).innerText = e.date;
       const gross = getEntryNetPay(e) + computeEntryDeductions(e);
       row.insertCell(1).innerHTML = '₱'+gross.toLocaleString(2);
-      row.insertCell(2).innerHTML = '₱'+computeEntryDeductions(e).toLocaleString(2);
-      row.insertCell(3).innerHTML = '₱'+getEntryNetPay(e).toLocaleString(2);
-      row.insertCell(4).innerHTML = '₱'+computeEntryAmortization(e).toLocaleString(2);
-      row.insertCell(5).innerHTML = '₱'+computeEntryMP2(e).toLocaleString(2);
-      row.insertCell(6).innerHTML = '₱'+computeEntrySavings(e).toLocaleString(2);
-      row.insertCell(7).innerHTML = '₱'+computeEntryTights(e).toLocaleString(2);
-      row.insertCell(8).innerHTML = '₱'+computeEntryFinal(e).toLocaleString(2);
-      row.insertCell(9).innerHTML = `<button class="edit-btn" data-id="${e.id}">✏️ Edit</button><button class="delete-btn" data-id="${e.id}">🗑️ Del</button>`;
+      row.insertCell(2).innerHTML = '₱'+getEntryNetPay(e).toLocaleString(2);
+      row.insertCell(3).innerHTML = '₱'+computeEntryAmortization(e).toLocaleString(2);
+      row.insertCell(4).innerHTML = '₱'+computeEntryMP2(e).toLocaleString(2);
+      row.insertCell(5).innerHTML = '₱'+computeEntrySavings(e).toLocaleString(2);
+      row.insertCell(6).innerHTML = '₱'+computeEntryTights(e).toLocaleString(2);
+      row.insertCell(7).innerHTML = '₱'+computeEntryFinal(e).toLocaleString(2);
+      row.insertCell(8).innerHTML = `<button class="edit-btn" data-id="${e.id}">✏️ Edit</button><button class="delete-btn" data-id="${e.id}">🗑️ Del</button>`;
     });
     attachEntryButtons();
     renderTotalRow(filtered);
