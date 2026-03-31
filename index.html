@@ -23,7 +23,6 @@
     body.dark-mode #resetAllBtn { background: #7f2e2e !important; color: #fecaca !important; }
     body.dark-mode #entriesFoot { background: #0f172a !important; color: #f1f5f9 !important; }
     body.dark-mode #entriesFoot td { background: #0f172a; color: #f1f5f9; border-top-color: #334155; }
-    /* Dark mode fix for "New entry" badge */
     body.dark-mode #formModeBadge,
     body.dark-mode #invFormModeBadge {
       background: #2d3a4e !important;
@@ -80,7 +79,6 @@
     body.dark-mode footer { color: #64748b; }
     @media (max-width: 680px) { .form-grid { grid-template-columns: 1fr; } .card-summary .amount { font-size: 1.3rem; } .tab-btn { padding: 8px 16px; font-size: 0.9rem; } .top-bar { flex-direction: column; align-items: stretch; } .header-actions { justify-content: flex-end; } }
 
-    /* Login overlay */
     .login-overlay {
       position: fixed;
       top: 0;
@@ -144,7 +142,7 @@
 </div>
 
 <div id="appContent" style="display: none;">
-  <!-- ========== APP CONTENT ========== -->
+  <!-- APP CONTENT -->
   <div class="container">
     <div class="top-bar">
       <h1>💰 Smart Ledger Pro</h1>
@@ -208,7 +206,7 @@
           <div class="input-field"><label>🏦 MP2 Contribution</label><input type="number" id="mp2Amount" step="0.01" value="2500"></div>
           <div class="input-field"><label>💰 Savings</label><input type="number" id="savingsAmount" step="0.01" placeholder="Will be rounded to nearest hundred"></div>
         </div>
-        <div class="badge-info">💡 Savings defaults to 15% of Net Pay (rounded to nearest hundred). Amortization + Car are combined as Amortization.</div>
+        <div class="badge-info">💡 Savings defaults to 15% of Net Pay (rounded to nearest hundred). Amortization + Car are both subtracted for net surplus, but only Amortization is shown in the table.</div>
         <div class="section-title">📋 Variable Expenses</div>
         <div class="form-grid">
           <div class="input-field"><label>⚡ Electric</label><input type="number" id="electric" step="0.01" value="0"></div>
@@ -231,7 +229,9 @@
       </div>
       <div class="table-wrapper">
         <table class="entries-table">
-          <thead>   <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th> </tr> </thead>
+          <thead>
+            <tr><th>Date</th><th>Gross Income</th><th>Deductions</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th></tr>
+          </thead>
           <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
           <tfoot id="entriesFoot"></tfoot>
         </table>
@@ -239,10 +239,47 @@
     </div>
 
     <!-- ANNUAL INCOME TAB -->
-    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead><tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr></thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+    <div id="annualTab" class="tab-content">
+      <div class="panel">
+        <div class="section-title">📅 Annual Income Summary</div>
+        <div class="table-wrapper">
+          <table class="annual-table">
+            <thead><tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr></thead>
+            <tbody id="annualBody"></tbody>
+          </table>
+        </div>
+        <div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div>
+      </div>
+    </div>
 
     <!-- INVESTMENTS TAB -->
-    <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2><button id="resetInvestmentsBtn" class="danger">Reset all investments</button></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead><tbody id="investmentsBody"></tbody></table></div></div>
+    <div id="investmentsTab" class="tab-content">
+      <div class="panel">
+        <div style="display: flex; justify-content: space-between;">
+          <h3>📈 Add / Edit Investment</h3>
+          <span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span>
+        </div>
+        <input type="hidden" id="editInvId">
+        <div class="form-grid">
+          <div class="input-field"><label>Title</label><input type="text" id="invTitle"></div>
+          <div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div>
+          <div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div>
+          <div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div>
+          <div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div>
+        </div>
+        <div class="action-buttons">
+          <button id="cancelInvEditBtn">Cancel</button>
+          <button id="submitInvBtn" class="primary">Add Investment</button>
+        </div>
+      </div>
+      <div class="entries-header"><h2>📊 Investment Portfolio</h2></div>
+      <div class="table-wrapper">
+        <table class="investments-table">
+          <thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead>
+          <tbody id="investmentsBody"></tbody>
+        </table>
+      </div>
+    </div>
 
     <footer>📌 Internet bill reminder: ₱10,000/year due June 15. Reminder appears on May 30. All data saved locally.</footer>
   </div>
@@ -340,7 +377,7 @@
     document.getElementById('newPassword').value = '';
     document.getElementById('confirmPassword').value = '';
     errorSpan.innerText = '';
-    // Optionally force re-login
+    // Force re-login
     document.getElementById('loginOverlay').style.display = 'flex';
     document.getElementById('appContent').style.display = 'none';
   });
@@ -354,7 +391,7 @@
 
   // ==================== ANNUAL ====================
   function loadAnnualData() {
-    const stored = localStorage.getItem('annualIncomeData_v12');
+    const stored = localStorage.getItem('annualIncomeData_v13');
     if (stored) annualData = JSON.parse(stored);
     if (!annualData.length) annualData = [
       { year: 2023, grossComp: 1086933.99, nonTaxable: 155433.74, taxable: 931500.25, taxDue: 135372.56, netIncome: 951561.43, monthlyNetAvg: 79296.79 },
@@ -363,7 +400,7 @@
     ];
     saveAnnualData();
   }
-  function saveAnnualData() { localStorage.setItem('annualIncomeData_v12', JSON.stringify(annualData)); }
+  function saveAnnualData() { localStorage.setItem('annualIncomeData_v13', JSON.stringify(annualData)); }
   function renderAnnualTable() {
     const tbody = document.getElementById('annualBody');
     if (!annualData.length) { tbody.innerHTML = '<tr><td colspan="7">No annual records.</td></tr>'; return; }
@@ -398,7 +435,7 @@
 
   // ==================== BUDGET ====================
   function loadFixedSettings() {
-    const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v14');
+    const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v15');
     if (stored) fixedIncome = { ...fixedIncome, ...JSON.parse(stored) };
     document.getElementById('fixedBasic').value = fixedIncome.basic;
     document.getElementById('fixedLaundry').value = fixedIncome.laundry;
@@ -416,13 +453,13 @@
       meal: parseFloat(document.getElementById('fixedMeal').value)||0,
       rice: parseFloat(document.getElementById('fixedRice').value)||0,
     };
-    localStorage.setItem('smartLedgerPro_fixedIncome_v14', JSON.stringify(fixedIncome));
+    localStorage.setItem('smartLedgerPro_fixedIncome_v15', JSON.stringify(fixedIncome));
     alert('Fixed income saved.');
     renderAllBudget();
   }
 
   function loadEntries() {
-    const stored = localStorage.getItem('smartLedgerPro_entries_v14');
+    const stored = localStorage.getItem('smartLedgerPro_entries_v15');
     if (stored) entries = JSON.parse(stored);
     if (!entries.length) {
       const demoDate = new Date(); demoDate.setDate(15);
@@ -440,17 +477,17 @@
       saveEntries();
     }
   }
-  function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v14', JSON.stringify(entries)); }
+  function saveEntries() { localStorage.setItem('smartLedgerPro_entries_v15', JSON.stringify(entries)); }
 
   function getEntryNetPay(entry) { return entry.netPay !== undefined ? entry.netPay : 0; }
   function computeEntrySavings(entry) { return entry.savingsAmount || 0; }
-  function computeEntryAmortization(e) { return (e.amortization||0)+(e.carFixed||0); }
+  function computeEntryAmortization(entry) { return entry.amortization || 0; }  // show only amortization
   function computeEntryMP2(e) { return e.mp2Amount||0; }
   function computeEntryDeductions(e) { return e.totalDeductions !== undefined ? e.totalDeductions : ((e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0)); }
   function computeEntryRemainingAfter(e) {
     const net = getEntryNetPay(e);
     const savings = computeEntrySavings(e);
-    const amort = computeEntryAmortization(e);
+    const amort = (e.amortization||0) + (e.carFixed||0);  // subtract both for net surplus
     const mp2 = computeEntryMP2(e);
     const varExp = (e.electric||0)+(e.waterHoa||0)+(e.internet||0)+(e.mealExpense||0)+(e.grocery||0);
     return net - savings - amort - mp2 - varExp;
@@ -631,13 +668,16 @@
         const colIndex = (name) => headers.findIndex(cell => String(cell).trim() === name);
         const idxPeriod = colIndex("Period");
         const idxTakeHome = colIndex("Take Home Pay");
-        const idxMPF = colIndex("MPF Employee Contribution");
-        const idxPhil = colIndex("Phil Health Employee Contribution");
-        const idxHDMF = colIndex("HDMF Employee Contribution");
-        const idxSSS = colIndex("SSS Employee Contribution");
-        const idxLeave = colIndex("Leave without Pay");
-        const idxTardiness = colIndex("Tardiness");
-        const idxTardinessAdj = colIndex("Tardiness Adjustment");
+        const deductionCols = [
+          "MPF Employee Contribution",
+          "Phil Health Employee Contribution",
+          "HDMF Employee Contribution",
+          "SSS Employee Contribution",
+          "Leave without Pay",
+          "Tardiness",
+          "Tardiness Adjustment"
+        ];
+        const idxDeductions = deductionCols.map(name => colIndex(name));
         if(idxPeriod === -1) reject("Period column not found");
         const newEntries = [];
         for(let i=1; i<rows.length; i++) {
@@ -654,21 +694,20 @@
           let formattedDate = `${dateObj.getFullYear()}-${String(dateObj.getMonth()+1).padStart(2,'0')}-${String(dateObj.getDate()).padStart(2,'0')}`;
           let takeHome = parseFloat(row[idxTakeHome]) || 0;
           if(takeHome===0) continue;
-          let mpf = idxMPF !== -1 ? (parseFloat(row[idxMPF]) || 0) : 0;
-          let phil = idxPhil !== -1 ? (parseFloat(row[idxPhil]) || 0) : 0;
-          let hdmf = idxHDMF !== -1 ? (parseFloat(row[idxHDMF]) || 0) : 0;
-          let sss = idxSSS !== -1 ? (parseFloat(row[idxSSS]) || 0) : 0;
-          let leave = idxLeave !== -1 ? (parseFloat(row[idxLeave]) || 0) : 0;
-          let tardiness = idxTardiness !== -1 ? (parseFloat(row[idxTardiness]) || 0) : 0;
-          let tardAdj = idxTardinessAdj !== -1 ? (parseFloat(row[idxTardinessAdj]) || 0) : 0;
-          let totalDeductions = mpf + phil + hdmf + sss + leave + tardiness + tardAdj;
+          let totalDeductions = 0;
+          for (let idx of idxDeductions) {
+            if (idx !== -1) {
+              let val = parseFloat(row[idx]);
+              if (!isNaN(val)) totalDeductions += val;
+            }
+          }
           let savings = Math.round((takeHome * 0.15) / 100) * 100;
           let newEntry = {
             id: Date.now() + i + Math.random(),
             date: formattedDate,
             netPay: takeHome,
-            mpf, philhealth: phil, hdmf, sss,
             totalDeductions: totalDeductions,
+            mpf: 0, philhealth: 0, hdmf: 0, sss: 0,  // individual values not stored separately, but total is
             amortization: 9500, carFixed: 2500, mp2Amount: 2500,
             savingsAmount: savings,
             electric: 0, waterHoa: 0, internet: 0, mealExpense: 2000, grocery: 2000,
@@ -704,12 +743,12 @@
 
   // ==================== INVESTMENTS ====================
   function loadInvestments() {
-    const stored = localStorage.getItem('investmentsData_v9');
+    const stored = localStorage.getItem('investmentsData_v10');
     investments = stored ? JSON.parse(stored) : [];
     if (!investments.length) investments = [{id:Date.now(), title:"Sample", description:"", totalInvested:0, totalProfit:0, maintenance:0}];
     saveInvestments();
   }
-  function saveInvestments() { localStorage.setItem('investmentsData_v9', JSON.stringify(investments)); }
+  function saveInvestments() { localStorage.setItem('investmentsData_v10', JSON.stringify(investments)); }
   function renderInvestmentsTable() {
     const tbody = document.getElementById('investmentsBody');
     if (!investments.length) { tbody.innerHTML = '<tr><td colspan="7">No investments.</td></tr>'; return; }
@@ -768,7 +807,6 @@
       saveInvestments(); renderInvestmentsTable(); clearInvestmentForm();
     }
   }
-  function resetInvestments() { if (confirm('Delete all investments?')) { investments = []; saveInvestments(); renderInvestmentsTable(); clearInvestmentForm(); } }
 
   // ==================== DARK MODE ====================
   function initDarkMode() {
@@ -811,7 +849,7 @@
     renderInvestmentsTable();
     initDarkMode();
 
-    // Attach event listeners (remove any previous ones first to avoid duplicates)
+    // Re-attach event listeners with fresh clones to avoid duplication
     const darkToggle = document.getElementById('darkModeToggle');
     const newDarkToggle = darkToggle.cloneNode(true);
     darkToggle.parentNode.replaceChild(newDarkToggle, darkToggle);
@@ -830,7 +868,7 @@
     const submitEntry = document.getElementById('submitEntryBtn');
     const newSubmitEntry = submitEntry.cloneNode(true);
     submitEntry.parentNode.replaceChild(newSubmitEntry, submitEntry);
-    newSubmitEntry.addEventListener('click', window.submitEntry);
+    newSubmitEntry.addEventListener('click', submitEntry);
 
     const cancelEdit = document.getElementById('cancelEditBtn');
     const newCancelEdit = cancelEdit.cloneNode(true);
@@ -856,11 +894,6 @@
     const newCancelInv = cancelInv.cloneNode(true);
     cancelInv.parentNode.replaceChild(newCancelInv, cancelInv);
     newCancelInv.addEventListener('click', clearInvestmentForm);
-
-    const resetInv = document.getElementById('resetInvestmentsBtn');
-    const newResetInv = resetInv.cloneNode(true);
-    resetInv.parentNode.replaceChild(newResetInv, resetInv);
-    newResetInv.addEventListener('click', resetInvestments);
 
     const yearFilter = document.getElementById('yearFilterSelect');
     const newYearFilter = yearFilter.cloneNode(true);
