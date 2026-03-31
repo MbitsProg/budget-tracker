@@ -6,7 +6,7 @@
   <title>Smart Ledger Pro | Budget Tracker</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    /* (All styles remain exactly as before – no changes) */
+    /* (All styles unchanged from previous working version) */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
     body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
     body.dark-mode { background: #121826; color: #e2e8f0; }
@@ -147,7 +147,7 @@
           <div class="input-field"><label>📅 Payday Date</label><input type="date" id="entryDate" required></div>
           <div class="input-field"><label>💸 Net Pay Received</label><input type="number" id="actualNetPay" step="0.01" placeholder="Amount you actually received"></div>
         </div>
-        <div class="section-title">🏛️ Government Deductions</div>
+        <div class="section-title">🏛️ Government Deductions (used for Dockages)</div>
         <div class="form-grid">
           <div class="input-field"><label>MPF</label><input type="number" id="mpf" step="0.01" value="750"></div>
           <div class="input-field"><label>PhilHealth</label><input type="number" id="philhealth" step="0.01" value="1863"></div>
@@ -182,27 +182,28 @@
       <div class="table-wrapper">
         <table class="entries-table">
           <thead>
-             <tr>
-               <th>Date</th>
-               <th>Gross Income</th>
-               <th>Net Pay</th>
-               <th>Amortization</th>
-               <th>MP2</th>
-               <th>Savings</th>
-               <th>Tights (10%)</th>
-               <th>Net Surplus</th>
-               <th>Actions</th>
-             </tr>
+            <tr>
+              <th>Date</th>
+              <th>Gross Income</th>
+              <th>Dockages</th>
+              <th>Net Pay</th>
+              <th>Amortization</th>
+              <th>MP2</th>
+              <th>Savings</th>
+              <th>Tights (10%)</th>
+              <th>Net Surplus</th>
+              <th>Actions</th>
+            </tr>
           </thead>
-          <tbody id="entriesBody"><tr><td colspan="9">No records. Add a manual entry or import Excel.</td></tr></tbody>
+          <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
           <tfoot id="entriesFoot"></tfoot>
         </table>
       </div>
     </div>
 
-    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead>   <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr> </thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead> <tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr> </thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
 
-    <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead><tbody id="investmentsBody"></tbody></table></div></div>
+    <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2></div><div class="table-wrapper"><table class="investments-table"><thead> <tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr> </thead><tbody id="investmentsBody"></tbody></table></div></div>
 
     <footer>📌 Internet bill reminder: ₱10,000/year due June 15. Reminder appears on May 30. All data saved locally.</footer>
   </div>
@@ -351,7 +352,7 @@
         id: Date.now(),
         date: demoDate.toISOString().slice(0,10),
         netPay: demoNet,
-        totalDeductions: 0,
+        dockages: 0,
         mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
         amortization: 9500, carFixed: 2500, mp2Amount: 2500,
         savingsAmount: Math.round((demoNet * 0.15) / 100) * 100,
@@ -366,7 +367,7 @@
   function computeEntrySavings(e) { return e.savingsAmount || 0; }
   function computeEntryAmortization(e) { return e.amortization || 0; }
   function computeEntryMP2(e) { return e.mp2Amount||0; }
-  function computeEntryDeductions(e) { return e.totalDeductions !== undefined ? e.totalDeductions : ((e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0)); }
+  function computeEntryDockages(e) { return e.dockages !== undefined ? e.dockages : ((e.mpf||0)+(e.philhealth||0)+(e.hdmf||0)+(e.sss||0)); }
   function computeEntryRemainingAfter(e) {
     const net = getEntryNetPay(e);
     const savings = computeEntrySavings(e);
@@ -398,9 +399,10 @@
 
   function renderTotalRow(filteredEntries) {
     if (!filteredEntries.length) { document.getElementById('entriesFoot').innerHTML = ''; return; }
-    const totals = { gross:0, netPay:0, amort:0, mp2:0, savings:0, tights:0, surplus:0 };
+    const totals = { gross:0, dockages:0, netPay:0, amort:0, mp2:0, savings:0, tights:0, surplus:0 };
     filteredEntries.forEach(e => {
-      totals.gross += getEntryNetPay(e) + computeEntryDeductions(e);
+      totals.gross += getEntryNetPay(e) + computeEntryDockages(e);
+      totals.dockages += computeEntryDockages(e);
       totals.netPay += getEntryNetPay(e);
       totals.amort += computeEntryAmortization(e);
       totals.mp2 += computeEntryMP2(e);
@@ -409,37 +411,39 @@
       totals.surplus += computeEntryFinal(e);
     });
     const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">
-       <td><strong>TOTAL</strong></td>
-       <td>₱${totals.gross.toLocaleString(2)}</td>
-       <td>₱${totals.netPay.toLocaleString(2)}</td>
-       <td>₱${totals.amort.toLocaleString(2)}</td>
-       <td>₱${totals.mp2.toLocaleString(2)}</td>
-       <td>₱${totals.savings.toLocaleString(2)}</td>
-       <td>₱${totals.tights.toLocaleString(2)}</td>
-       <td>₱${totals.surplus.toLocaleString(2)}</td>
-       <td></td>
-     </tr>`;
+        <td><strong>TOTAL</strong></td>
+        <td>₱${totals.gross.toLocaleString(2)}</td>
+        <td>₱${totals.dockages.toLocaleString(2)}</td>
+        <td>₱${totals.netPay.toLocaleString(2)}</td>
+        <td>₱${totals.amort.toLocaleString(2)}</td>
+        <td>₱${totals.mp2.toLocaleString(2)}</td>
+        <td>₱${totals.savings.toLocaleString(2)}</td>
+        <td>₱${totals.tights.toLocaleString(2)}</td>
+        <td>₱${totals.surplus.toLocaleString(2)}</td>
+        <td></td>
+      </tr>`;
     document.getElementById('entriesFoot').innerHTML = footRow;
   }
 
   function renderEntriesTable() {
     const filtered = currentYearFilter === 'all' ? entries : entries.filter(e => new Date(e.date).getFullYear() === parseInt(currentYearFilter));
     const tbody = document.getElementById('entriesBody');
-    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="9">No records for selected year.</td></tr>'; renderTotalRow([]); renderBudgetDashboard(); return; }
+    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="10">No records for selected year.</td></tr>'; renderTotalRow([]); renderBudgetDashboard(); return; }
     const sorted = [...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date));
     tbody.innerHTML = '';
     sorted.forEach(e => {
       const row = tbody.insertRow();
       row.insertCell(0).innerText = e.date;
-      const gross = getEntryNetPay(e) + computeEntryDeductions(e);
+      const gross = getEntryNetPay(e) + computeEntryDockages(e);
       row.insertCell(1).innerHTML = '₱'+gross.toLocaleString(2);
-      row.insertCell(2).innerHTML = '₱'+getEntryNetPay(e).toLocaleString(2);
-      row.insertCell(3).innerHTML = '₱'+computeEntryAmortization(e).toLocaleString(2);
-      row.insertCell(4).innerHTML = '₱'+computeEntryMP2(e).toLocaleString(2);
-      row.insertCell(5).innerHTML = '₱'+computeEntrySavings(e).toLocaleString(2);
-      row.insertCell(6).innerHTML = '₱'+computeEntryTights(e).toLocaleString(2);
-      row.insertCell(7).innerHTML = '₱'+computeEntryFinal(e).toLocaleString(2);
-      row.insertCell(8).innerHTML = `<button class="edit-btn" data-id="${e.id}">✏️ Edit</button><button class="delete-btn" data-id="${e.id}">🗑️ Del</button>`;
+      row.insertCell(2).innerHTML = '₱'+computeEntryDockages(e).toLocaleString(2);
+      row.insertCell(3).innerHTML = '₱'+getEntryNetPay(e).toLocaleString(2);
+      row.insertCell(4).innerHTML = '₱'+computeEntryAmortization(e).toLocaleString(2);
+      row.insertCell(5).innerHTML = '₱'+computeEntryMP2(e).toLocaleString(2);
+      row.insertCell(6).innerHTML = '₱'+computeEntrySavings(e).toLocaleString(2);
+      row.insertCell(7).innerHTML = '₱'+computeEntryTights(e).toLocaleString(2);
+      row.insertCell(8).innerHTML = '₱'+computeEntryFinal(e).toLocaleString(2);
+      row.insertCell(9).innerHTML = `<button class="edit-btn" data-id="${e.id}">✏️ Edit</button><button class="delete-btn" data-id="${e.id}">🗑️ Del</button>`;
     });
     attachEntryButtons();
     renderTotalRow(filtered);
@@ -499,12 +503,12 @@
     const phil = parseFloat(document.getElementById('philhealth').value)||0;
     const hdmf = parseFloat(document.getElementById('hdmf').value)||0;
     const sss = parseFloat(document.getElementById('sss').value)||0;
-    const totalDed = mpf+phil+hdmf+sss;
+    const totalDockages = mpf+phil+hdmf+sss;
     return {
       date: document.getElementById('entryDate').value,
       netPay: isNaN(net) ? 0 : net,
       mpf, philhealth: phil, hdmf, sss,
-      totalDeductions: totalDed,
+      dockages: totalDockages,
       amortization: parseFloat(document.getElementById('amortization').value)||0,
       carFixed: parseFloat(document.getElementById('carFixed').value)||0,
       mp2Amount: parseFloat(document.getElementById('mp2Amount').value)||0,
@@ -530,7 +534,7 @@
   }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){ entries=[]; saveEntries(); updateYearFilterOptions(); renderEntriesTable(); clearForm(); } }
 
-  // ---------- EXCEL IMPORT (fixed date parsing + deduction summing) ----------
+  // ---------- EXCEL IMPORT (sums all seven deduction columns into 'dockages') ----------
   async function parseExcelToEntries(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -541,7 +545,6 @@
         const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
         if(!rows || rows.length < 2) reject("No data found");
         const headers = rows[0];
-        // Normalize headers for matching
         const normHeaders = headers.map(h => String(h).trim().toLowerCase().replace(/[^a-z0-9]/g, ''));
         function findCol(patterns) {
           for (let i = 0; i < normHeaders.length; i++) {
@@ -556,7 +559,6 @@
         const periodIdx = findCol(["period"]);
         const takeHomeIdx = findCol(["takehomepay", "takehome", "take home pay"]);
         if (periodIdx === -1) reject("Period column not found");
-        // Deduction patterns
         const deductionPatterns = [
           ["mpf", "mpfemployee"],
           ["philhealth", "philhealthemployee", "phil health"],
@@ -573,15 +575,12 @@
           if (!row || row.length===0) continue;
           const periodVal = row[periodIdx];
           if (!periodVal) continue;
-          // Extract date from period string (e.g., "FPIRF_SEMI02-03/30/2026")
           const dateMatch = String(periodVal).match(/(\d{1,2}\/\d{1,2}\/\d{4})/);
           if (!dateMatch) continue;
-          // Correctly split month/day/year
           const [month, day, year] = dateMatch[1].split('/');
           const formattedDate = `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
           let takeHome = takeHomeIdx !== -1 ? (parseFloat(row[takeHomeIdx]) || 0) : 0;
           if (takeHome === 0) continue;
-          // Sum all deduction columns
           let totalDed = 0;
           for (let idx of deductionIndices) {
             if (idx !== -1) {
@@ -594,7 +593,7 @@
             id: Date.now() + i + Math.random(),
             date: formattedDate,
             netPay: takeHome,
-            totalDeductions: totalDed,
+            dockages: totalDed,
             mpf: 0, philhealth: 0, hdmf: 0, sss: 0,
             amortization: 9500, carFixed: 2500, mp2Amount: 2500,
             savingsAmount: savings,
@@ -734,7 +733,6 @@
     renderInvestmentsTable();
     initDarkMode();
 
-    // Reattach listeners with clones to avoid duplicates
     const cloneAndReplace = (id, handler) => {
       const el = document.getElementById(id);
       const clone = el.cloneNode(true);
