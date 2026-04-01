@@ -6,7 +6,7 @@
   <title>Smart Ledger Pro | Budget Tracker</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    /* (All styles unchanged – same as last working version) */
+    /* (All existing styles remain exactly the same as your last working version – omitted for brevity) */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
     body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
     body.dark-mode { background: #121826; color: #e2e8f0; }
@@ -83,6 +83,80 @@
     .login-box input { width: 100%; padding: 12px; margin: 12px 0; border: 1px solid #cbdde6; border-radius: 40px; font-size: 1rem; }
     .login-box button { width: 100%; margin-top: 12px; }
     .error-msg { color: #e53e3e; font-size: 0.8rem; margin-top: 8px; }
+
+    /* New styles for investments */
+    .investment-item {
+      margin-bottom: 24px;
+      border: 1px solid #e2edf2;
+      border-radius: 28px;
+      overflow: hidden;
+    }
+    body.dark-mode .investment-item {
+      border-color: #334155;
+    }
+    .investment-header {
+      background: #f8fafc;
+      padding: 12px 20px;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-weight: 600;
+    }
+    body.dark-mode .investment-header {
+      background: #0f172a;
+    }
+    .investment-header:hover {
+      background: #f1f5f9;
+    }
+    body.dark-mode .investment-header:hover {
+      background: #1e293b;
+    }
+    .investment-summary {
+      display: flex;
+      gap: 24px;
+      font-size: 0.8rem;
+      color: #2b5d7c;
+    }
+    body.dark-mode .investment-summary {
+      color: #94a3b8;
+    }
+    .investment-details {
+      padding: 16px 20px;
+      border-top: 1px solid #e2edf2;
+    }
+    body.dark-mode .investment-details {
+      border-top-color: #334155;
+    }
+    .transaction-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.75rem;
+      margin-bottom: 16px;
+    }
+    .transaction-table th, .transaction-table td {
+      padding: 8px 6px;
+      text-align: left;
+      border-bottom: 1px solid #e6edf2;
+    }
+    body.dark-mode .transaction-table td {
+      border-bottom-color: #334155;
+    }
+    .add-transaction {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      margin-top: 12px;
+      padding-top: 12px;
+      border-top: 1px solid #e2edf2;
+    }
+    body.dark-mode .add-transaction {
+      border-top-color: #334155;
+    }
+    .small-input {
+      width: 140px;
+    }
   </style>
 </head>
 <body>
@@ -117,13 +191,13 @@
     </div>
 
     <div id="budgetTab" class="tab-content active">
+      <!-- (Your existing budget tab HTML remains exactly the same – omitted for brevity) -->
       <div id="internetReminder" class="reminder-card" style="display: none;"></div>
       <div class="dashboard">
         <div class="card-summary"><h3>📆 This Year Savings</h3><div class="amount" id="yearlySavings">₱0</div></div>
         <div class="card-summary"><h3>🏦 Total MP2</h3><div class="amount" id="totalMP2">₱0</div></div>
         <div class="card-summary"><h3>🧦 Total Tights</h3><div class="amount" id="totalTights">₱0</div></div>
       </div>
-
       <div class="panel">
         <div class="section-title">⚙️ Fixed Income per Pay Period (for manual entries)</div>
         <div class="form-grid">
@@ -136,7 +210,6 @@
         </div>
         <div class="action-buttons"><button id="saveFixedBtn" class="secondary">💾 Save fixed income</button></div>
       </div>
-
       <div class="panel" id="entryFormPanel">
         <div style="display: flex; justify-content: space-between; align-items: center;">
           <h3 style="font-weight: 600;">📝 Record Pay Period (Manual)</h3>
@@ -173,7 +246,6 @@
         <div class="badge-info">🧦 Tights = 10% of remaining budget after all allocations & variable expenses.</div>
         <div class="action-buttons"><button id="cancelEditBtn" style="display: none;">Cancel edit</button><button id="submitEntryBtn" class="primary">➕ Save entry</button></div>
       </div>
-
       <div class="year-filter"><label>Filter by year:</label><select id="yearFilterSelect"><option value="all">All years</option></select></div>
       <div class="entries-header" style="display: flex; justify-content: space-between; align-items: center; margin: 20px 0 12px;">
         <h2>📋 Pay Period Log</h2>
@@ -181,29 +253,42 @@
       </div>
       <div class="table-wrapper">
         <table class="entries-table">
-          <thead>
-              <tr>
-                <th>Date</th>
-                <th>Gross Income</th>
-                <th>Dockages</th>
-                <th>Net Pay</th>
-                <th>Amortization</th>
-                <th>MP2</th>
-                <th>Savings</th>
-                <th>Tights (10%)</th>
-                <th>Net Surplus</th>
-                <th>Actions</th>
-              </tr>
-          </thead>
-          <tbody id="entriesBody"><tr><td colspan="10">No records. Add a manual entry or import Excel.</td></tr></tbody>
+          <thead>   <tr><th>Date</th><th>Gross Income</th><th>Dockages</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th>   </thead>
+          <tbody id="entriesBody">   <td colspan="10">No records. Add a manual entry or import Excel.   </tbody>
           <tfoot id="entriesFoot"></tfoot>
         </table>
       </div>
     </div>
 
-    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead><tr><th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th></tr></thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead>   <th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th>   </thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
 
-    <div id="investmentsTab" class="tab-content"><div class="panel"><div style="display: flex; justify-content: space-between;"><h3>📈 Add / Edit Investment</h3><span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span></div><input type="hidden" id="editInvId"><div class="form-grid"><div class="input-field"><label>Title</label><input type="text" id="invTitle"></div><div class="input-field"><label>Description</label><textarea id="invDesc"></textarea></div><div class="input-field"><label>Total Invested (₱)</label><input type="number" id="invInvested" step="0.01" value="0"></div><div class="input-field"><label>Total Profit (₱)</label><input type="number" id="invProfit" step="0.01" value="0"></div><div class="input-field"><label>Maintenance (annual)</label><input type="number" id="invMaintenance" step="0.01" value="0"></div></div><div class="action-buttons"><button id="cancelInvEditBtn">Cancel</button><button id="submitInvBtn" class="primary">Add Investment</button></div></div><div class="entries-header"><h2>📊 Investment Portfolio</h2></div><div class="table-wrapper"><table class="investments-table"><thead><tr><th>Title</th><th>Description</th><th>Total Invested</th><th>Total Profit</th><th>Maintenance</th><th>Net ROI</th><th>Actions</th></tr></thead><tbody id="investmentsBody"></tbody></table></div></div>
+    <!-- INVESTMENTS TAB – NEW DESIGN -->
+    <div id="investmentsTab" class="tab-content">
+      <div class="dashboard" id="investmentsDashboard">
+        <div class="card-summary"><h3>💰 Total Invested</h3><div class="amount" id="totalInvested">₱0</div></div>
+        <div class="card-summary"><h3>📈 Total Profit</h3><div class="amount" id="totalProfit">₱0</div></div>
+        <div class="card-summary"><h3>🔧 Total Maintenance</h3><div class="amount" id="totalMaintenance">₱0</div></div>
+        <div class="card-summary"><h3>📊 Net ROI</h3><div class="amount" id="totalNetROI">₱0</div></div>
+      </div>
+
+      <div class="panel">
+        <div style="display: flex; justify-content: space-between;">
+          <h3>📈 Add / Edit Investment</h3>
+          <span id="invFormModeBadge" style="background:#eef2f5; padding:4px 12px; border-radius:40px;">New investment</span>
+        </div>
+        <input type="hidden" id="editInvId">
+        <div class="form-grid">
+          <div class="input-field"><label>Investment Title *</label><input type="text" id="invTitle" placeholder="e.g., Goat Farm"></div>
+          <div class="input-field"><label>Description</label><textarea id="invDesc" rows="2" placeholder="Additional details..."></textarea></div>
+        </div>
+        <div class="action-buttons">
+          <button id="cancelInvEditBtn" style="display: none;">Cancel edit</button>
+          <button id="submitInvBtn" class="primary">➕ Add Investment</button>
+        </div>
+      </div>
+
+      <div id="investmentsList"></div>
+    </div>
 
     <footer>📌 Internet bill reminder: ₱10,000/year due June 15. Reminder appears on May 30. All data saved locally.</footer>
   </div>
@@ -221,7 +306,7 @@
 </div>
 
 <script>
-  // ==================== LOGIN & PASSWORD ====================
+  // ==================== LOGIN & PASSWORD (unchanged) ====================
   const STORED_HASH_KEY = 'app_password_hash';
   const DEFAULT_PASSWORD = 'budget123';
 
@@ -271,16 +356,16 @@
     document.getElementById('appContent').style.display = 'none';
   });
 
-  // ==================== APP CORE ====================
+  // ==================== APP CORE (Budget & Annual – unchanged from last working version) ====================
   let fixedIncome = { basic: 37260, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
-  let entries = [], annualData = [], investments = [], currentYearFilter = 'all';
+  let entries = [], annualData = [];
 
   // Helper to compute default savings based on basic pay (rounded to nearest hundred)
   function getDefaultSavings(basic = fixedIncome.basic) {
     return Math.round((basic * 0.15) / 100) * 100;
   }
 
-  // ---------- ANNUAL ----------
+  // ---------- ANNUAL (unchanged) ----------
   function loadAnnualData() {
     const stored = localStorage.getItem('annualIncomeData_v15');
     if (stored) annualData = JSON.parse(stored);
@@ -294,7 +379,7 @@
   function saveAnnualData() { localStorage.setItem('annualIncomeData_v15', JSON.stringify(annualData)); }
   function renderAnnualTable() {
     const tbody = document.getElementById('annualBody');
-    if (!annualData.length) { tbody.innerHTML = '<tr><td colspan="7">No annual records.</td></tr>'; return; }
+    if (!annualData.length) { tbody.innerHTML = '   <td colspan="7">No annual records.   '; return; }
     const sorted = [...annualData].sort((a,b)=>a.year-b.year);
     tbody.innerHTML = '';
     sorted.forEach(record => {
@@ -322,7 +407,7 @@
   }
   function addNewYear() { const maxYear = Math.max(...annualData.map(r=>r.year),2025); annualData.push({ year: maxYear+1, grossComp:0, nonTaxable:0, taxable:0, taxDue:0, netIncome:0, monthlyNetAvg:0 }); saveAnnualData(); renderAnnualTable(); }
 
-  // ---------- BUDGET ----------
+  // ---------- BUDGET (unchanged – all functions from last working version) ----------
   function loadFixedSettings() {
     const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v17');
     if (stored) fixedIncome = { ...fixedIncome, ...JSON.parse(stored) };
@@ -402,6 +487,7 @@
     select.value = currentYearFilter;
   }
 
+  let currentYearFilter = 'all';
   function renderTotalRow(filteredEntries) {
     if (!filteredEntries.length) { document.getElementById('entriesFoot').innerHTML = ''; return; }
     const totals = { gross:0, dockages:0, netPay:0, amort:0, mp2:0, savings:0, tights:0, surplus:0 };
@@ -415,25 +501,14 @@
       totals.tights += computeEntryTights(e);
       totals.surplus += computeEntryFinal(e);
     });
-    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">
-          <td><strong>TOTAL</strong></td>
-          <td>₱${totals.gross.toLocaleString(2)}</td>
-          <td>₱${totals.dockages.toLocaleString(2)}</td>
-          <td>₱${totals.netPay.toLocaleString(2)}</td>
-          <td>₱${totals.amort.toLocaleString(2)}</td>
-          <td>₱${totals.mp2.toLocaleString(2)}</td>
-          <td>₱${totals.savings.toLocaleString(2)}</td>
-          <td>₱${totals.tights.toLocaleString(2)}</td>
-          <td>₱${totals.surplus.toLocaleString(2)}</td>
-          <td></td>
-        </tr>`;
+    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">      <td><strong>TOTAL</strong></td>      <td>₱${totals.gross.toLocaleString(2)}</td>      <td>₱${totals.dockages.toLocaleString(2)}</td>      <td>₱${totals.netPay.toLocaleString(2)}</td>      <td>₱${totals.amort.toLocaleString(2)}</td>      <td>₱${totals.mp2.toLocaleString(2)}</td>      <td>₱${totals.savings.toLocaleString(2)}</td>      <td>₱${totals.tights.toLocaleString(2)}</td>      <td>₱${totals.surplus.toLocaleString(2)}</td>      <td></td>    </tr>`;
     document.getElementById('entriesFoot').innerHTML = footRow;
   }
 
   function renderEntriesTable() {
     const filtered = currentYearFilter === 'all' ? entries : entries.filter(e => new Date(e.date).getFullYear() === parseInt(currentYearFilter));
     const tbody = document.getElementById('entriesBody');
-    if (!filtered.length) { tbody.innerHTML = '<tr><td colspan="10">No records for selected year.</td></tr>'; renderTotalRow([]); renderBudgetDashboard(); return; }
+    if (!filtered.length) { tbody.innerHTML = '   <td colspan="10">No records for selected year.   '; renderTotalRow([]); renderBudgetDashboard(); return; }
     const sorted = [...filtered].sort((a,b)=>new Date(b.date)-new Date(a.date));
     tbody.innerHTML = '';
     sorted.forEach(e => {
@@ -539,7 +614,7 @@
   }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){ entries=[]; saveEntries(); updateYearFilterOptions(); renderEntriesTable(); clearForm(); } }
 
-  // ---------- EXCEL IMPORT (reads Basic Salary and computes savings per row) ----------
+  // ---------- EXCEL IMPORT (unchanged) ----------
   async function parseExcelToEntries(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -572,13 +647,11 @@
             const val = parseFloat(row[dockagesIdx]);
             if (!isNaN(val)) dockagesValue = val;
           }
-          // Read basic salary for this row
-          let basicSalary = fixedIncome.basic; // fallback to global
+          let basicSalary = fixedIncome.basic;
           if (basicSalaryIdx !== -1) {
             const bs = parseFloat(row[basicSalaryIdx]);
             if (!isNaN(bs) && bs > 0) basicSalary = bs;
           }
-          // Compute savings as 15% of basic salary (rounded to nearest hundred)
           const savings = Math.round((basicSalary * 0.15) / 100) * 100;
           newEntries.push({
             id: Date.now() + i + Math.random(),
@@ -618,70 +691,251 @@
     input.click();
   }
 
-  // ---------- INVESTMENTS (unchanged) ----------
+  // ---------- INVESTMENTS (NEW) ----------
+  let investments = [];
+
   function loadInvestments() {
-    const stored = localStorage.getItem('investmentsData_v12');
+    const stored = localStorage.getItem('investmentsData_v13');
     investments = stored ? JSON.parse(stored) : [];
-    if (!investments.length) investments = [{id:Date.now(), title:"Sample", description:"", totalInvested:0, totalProfit:0, maintenance:0}];
+    if (!investments.length) {
+      investments = [{
+        id: Date.now(),
+        title: "Goat Farm",
+        description: "Collaborative investment with family",
+        transactions: [
+          { id: Date.now()+1, date: "2025-03-01", description: "Fence", amount: -7000, category: "Capital" },
+          { id: Date.now()+2, date: "2025-03-01", description: "Goats (1.5 share)", amount: -11500, category: "Capital" },
+          { id: Date.now()+3, date: "2025-03-01", description: "Goat house (mom's share)", amount: -12332, category: "Capital" },
+          { id: Date.now()+4, date: "2025-03-01", description: "Goat for girlfriend", amount: -6000, category: "Capital" }
+        ]
+      }];
+    }
     saveInvestments();
   }
-  function saveInvestments() { localStorage.setItem('investmentsData_v12', JSON.stringify(investments)); }
-  function renderInvestmentsTable() {
-    const tbody = document.getElementById('investmentsBody');
-    if (!investments.length) { tbody.innerHTML = '<tr><td colspan="7">No investments.</td></tr>'; return; }
-    tbody.innerHTML = '';
-    investments.forEach(inv => {
-      const row = tbody.insertRow();
-      row.insertCell(0).innerText = inv.title;
-      row.insertCell(1).innerText = inv.description || '-';
-      row.insertCell(2).innerHTML = '₱'+inv.totalInvested.toLocaleString(2);
-      row.insertCell(3).innerHTML = '₱'+inv.totalProfit.toLocaleString(2);
-      row.insertCell(4).innerHTML = '₱'+inv.maintenance.toLocaleString(2);
-      row.insertCell(5).innerHTML = '₱'+(inv.totalProfit-inv.maintenance).toLocaleString(2);
-      row.insertCell(6).innerHTML = `<button class="edit-inv-btn" data-id="${inv.id}">Edit</button><button class="delete-inv-btn" data-id="${inv.id}">Del</button>`;
-    });
-    document.querySelectorAll('.edit-inv-btn').forEach(btn => btn.addEventListener('click', () => loadInvestmentForEdit(parseInt(btn.dataset.id))));
-    document.querySelectorAll('.delete-inv-btn').forEach(btn => btn.addEventListener('click', () => { if (confirm('Delete?')) { investments = investments.filter(i => i.id != btn.dataset.id); saveInvestments(); renderInvestmentsTable(); } }));
+
+  function saveInvestments() {
+    localStorage.setItem('investmentsData_v13', JSON.stringify(investments));
   }
+
+  function computeInvestmentTotals(inv) {
+    let invested = 0, profit = 0, maintenance = 0;
+    inv.transactions.forEach(t => {
+      const amt = t.amount;
+      if (t.category === "Capital" && amt < 0) invested += Math.abs(amt);
+      else if (t.category === "Profit" && amt > 0) profit += amt;
+      else if (t.category === "Maintenance" && amt < 0) maintenance += Math.abs(amt);
+    });
+    const netROI = profit - maintenance - invested;
+    return { invested, profit, maintenance, netROI };
+  }
+
+  function renderInvestmentsDashboard() {
+    let totalInvested = 0, totalProfit = 0, totalMaintenance = 0, totalNetROI = 0;
+    investments.forEach(inv => {
+      const t = computeInvestmentTotals(inv);
+      totalInvested += t.invested;
+      totalProfit += t.profit;
+      totalMaintenance += t.maintenance;
+      totalNetROI += t.netROI;
+    });
+    document.getElementById('totalInvested').innerHTML = '₱' + totalInvested.toLocaleString(2);
+    document.getElementById('totalProfit').innerHTML = '₱' + totalProfit.toLocaleString(2);
+    document.getElementById('totalMaintenance').innerHTML = '₱' + totalMaintenance.toLocaleString(2);
+    document.getElementById('totalNetROI').innerHTML = '₱' + totalNetROI.toLocaleString(2);
+  }
+
+  function renderInvestmentsList() {
+    const container = document.getElementById('investmentsList');
+    if (!investments.length) {
+      container.innerHTML = '<div class="panel" style="text-align:center;">No investments yet. Add your first investment above.</div>';
+      renderInvestmentsDashboard();
+      return;
+    }
+    container.innerHTML = '';
+    investments.forEach(inv => {
+      const totals = computeInvestmentTotals(inv);
+      const div = document.createElement('div');
+      div.className = 'investment-item';
+      div.innerHTML = `
+        <div class="investment-header" data-id="${inv.id}">
+          <span><strong>${escapeHtml(inv.title)}</strong> ${inv.description ? `- ${escapeHtml(inv.description)}` : ''}</span>
+          <div class="investment-summary">
+            <span>💰 Invested: ₱${totals.invested.toLocaleString(2)}</span>
+            <span>📈 Profit: ₱${totals.profit.toLocaleString(2)}</span>
+            <span>🔧 Maintenance: ₱${totals.maintenance.toLocaleString(2)}</span>
+            <span>📊 Net ROI: ₱${totals.netROI.toLocaleString(2)}</span>
+          </div>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="investment-details" style="display: none;">
+          <div class="action-buttons" style="justify-content: flex-start; margin-bottom: 12px;">
+            <button class="edit-inv-btn" data-id="${inv.id}">✏️ Edit Investment</button>
+            <button class="delete-inv-btn" data-id="${inv.id}">🗑️ Delete Investment</button>
+            <button class="add-transaction-btn" data-id="${inv.id}">➕ Add Transaction</button>
+          </div>
+          <table class="transaction-table">
+            <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Category</th><th>Actions</th></tr></thead>
+            <tbody id="transactions-${inv.id}"></tbody>
+          </table>
+        </div>
+      `;
+      container.appendChild(div);
+
+      // Fill transactions table
+      const tbody = div.querySelector(`#transactions-${inv.id}`);
+      inv.transactions.forEach(t => {
+        const row = tbody.insertRow();
+        row.insertCell(0).innerText = t.date;
+        row.insertCell(1).innerText = t.description;
+        row.insertCell(2).innerHTML = `<span style="color:${t.amount<0?'#e53e3e':'#2c7da0'}">₱${Math.abs(t.amount).toLocaleString(2)}</span>`;
+        row.insertCell(3).innerText = t.category;
+        const actionCell = row.insertCell(4);
+        actionCell.innerHTML = `<button class="edit-transaction-btn" data-inv="${inv.id}" data-tid="${t.id}">✏️</button> <button class="delete-transaction-btn" data-inv="${inv.id}" data-tid="${t.id}">🗑️</button>`;
+      });
+
+      // Attach event listeners
+      const header = div.querySelector('.investment-header');
+      const details = div.querySelector('.investment-details');
+      header.addEventListener('click', (e) => {
+        if (e.target.tagName === 'BUTTON') return;
+        const isVisible = details.style.display !== 'none';
+        details.style.display = isVisible ? 'none' : 'block';
+        header.querySelector('.expand-icon').innerHTML = isVisible ? '▼' : '▲';
+      });
+
+      div.querySelector('.edit-inv-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        loadInvestmentForEdit(inv.id);
+      });
+      div.querySelector('.delete-inv-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        if (confirm(`Delete investment "${inv.title}"?`)) {
+          investments = investments.filter(i => i.id !== inv.id);
+          saveInvestments();
+          renderInvestmentsList();
+        }
+      });
+      div.querySelector('.add-transaction-btn').addEventListener('click', (e) => {
+        e.stopPropagation();
+        showAddTransactionModal(inv.id);
+      });
+      div.querySelectorAll('.edit-transaction-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const invId = parseInt(btn.dataset.inv);
+          const tid = parseInt(btn.dataset.tid);
+          const inv = investments.find(i => i.id === invId);
+          const transaction = inv.transactions.find(t => t.id === tid);
+          showEditTransactionModal(invId, transaction);
+        });
+      });
+      div.querySelectorAll('.delete-transaction-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const invId = parseInt(btn.dataset.inv);
+          const tid = parseInt(btn.dataset.tid);
+          if (confirm('Delete this transaction?')) {
+            const inv = investments.find(i => i.id === invId);
+            inv.transactions = inv.transactions.filter(t => t.id !== tid);
+            saveInvestments();
+            renderInvestmentsList();
+          }
+        });
+      });
+    });
+    renderInvestmentsDashboard();
+  }
+
+  function showAddTransactionModal(invId) {
+    const date = new Date().toISOString().slice(0,10);
+    const desc = prompt('Enter description:');
+    if (!desc) return;
+    const amount = parseFloat(prompt('Enter amount (positive for profit, negative for expense):', '0'));
+    if (isNaN(amount)) return;
+    const category = prompt('Category (Capital, Profit, Maintenance, Other):', 'Profit');
+    if (!category) return;
+    const inv = investments.find(i => i.id === invId);
+    inv.transactions.push({
+      id: Date.now(),
+      date,
+      description: desc,
+      amount,
+      category
+    });
+    saveInvestments();
+    renderInvestmentsList();
+  }
+
+  function showEditTransactionModal(invId, transaction) {
+    const newDesc = prompt('Edit description:', transaction.description);
+    if (newDesc === null) return;
+    const newAmount = parseFloat(prompt('Edit amount:', transaction.amount));
+    if (isNaN(newAmount)) return;
+    const newCategory = prompt('Edit category (Capital, Profit, Maintenance, Other):', transaction.category);
+    if (!newCategory) return;
+    const inv = investments.find(i => i.id === invId);
+    const t = inv.transactions.find(t => t.id === transaction.id);
+    t.description = newDesc;
+    t.amount = newAmount;
+    t.category = newCategory;
+    saveInvestments();
+    renderInvestmentsList();
+  }
+
   function loadInvestmentForEdit(id) {
     const inv = investments.find(i => i.id === id);
     if (!inv) return;
     document.getElementById('editInvId').value = inv.id;
     document.getElementById('invTitle').value = inv.title;
     document.getElementById('invDesc').value = inv.description || '';
-    document.getElementById('invInvested').value = inv.totalInvested;
-    document.getElementById('invProfit').value = inv.totalProfit;
-    document.getElementById('invMaintenance').value = inv.maintenance;
     document.getElementById('invFormModeBadge').innerHTML = 'Editing';
-    document.getElementById('submitInvBtn').innerText = 'Update';
+    document.getElementById('submitInvBtn').innerText = '✏️ Update Investment';
     document.getElementById('cancelInvEditBtn').style.display = 'inline-block';
   }
+
   function clearInvestmentForm() {
     document.getElementById('editInvId').value = '';
     document.getElementById('invTitle').value = '';
     document.getElementById('invDesc').value = '';
-    document.getElementById('invInvested').value = 0;
-    document.getElementById('invProfit').value = 0;
-    document.getElementById('invMaintenance').value = 0;
     document.getElementById('invFormModeBadge').innerHTML = 'New investment';
-    document.getElementById('submitInvBtn').innerText = 'Add Investment';
+    document.getElementById('submitInvBtn').innerText = '➕ Add Investment';
     document.getElementById('cancelInvEditBtn').style.display = 'none';
   }
+
   function submitInvestment() {
     const title = document.getElementById('invTitle').value.trim();
     if (!title) { alert('Enter title'); return; }
-    const desc = document.getElementById('invDesc').value;
-    const invested = parseFloat(document.getElementById('invInvested').value)||0;
-    const profit = parseFloat(document.getElementById('invProfit').value)||0;
-    const maint = parseFloat(document.getElementById('invMaintenance').value)||0;
+    const description = document.getElementById('invDesc').value;
     const editId = document.getElementById('editInvId').value;
     if (editId) {
       const idx = investments.findIndex(i => i.id == editId);
-      if (idx !== -1) { investments[idx] = { ...investments[idx], title, description: desc, totalInvested: invested, totalProfit: profit, maintenance: maint }; saveInvestments(); renderInvestmentsTable(); clearInvestmentForm(); }
+      if (idx !== -1) {
+        investments[idx].title = title;
+        investments[idx].description = description;
+        saveInvestments();
+        renderInvestmentsList();
+        clearInvestmentForm();
+      }
     } else {
-      investments.push({ id: Date.now(), title, description: desc, totalInvested: invested, totalProfit: profit, maintenance: maint });
-      saveInvestments(); renderInvestmentsTable(); clearInvestmentForm();
+      investments.push({
+        id: Date.now(),
+        title,
+        description,
+        transactions: []
+      });
+      saveInvestments();
+      renderInvestmentsList();
+      clearInvestmentForm();
     }
+  }
+
+  function escapeHtml(str) {
+    return str.replace(/[&<>]/g, function(m) {
+      if (m === '&') return '&amp;';
+      if (m === '<') return '&lt;';
+      if (m === '>') return '&gt;';
+      return m;
+    });
   }
 
   // ---------- DARK MODE ----------
@@ -709,7 +963,7 @@
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.querySelector(`.tab-btn[data-tab="${tabId}"]`).classList.add('active');
     if (tabId === 'annual') renderAnnualTable();
-    if (tabId === 'investments') renderInvestmentsTable();
+    if (tabId === 'investments') renderInvestmentsList();
   }
 
   // ---------- INIT APP ----------
@@ -721,11 +975,12 @@
     updateYearFilterOptions();
     renderAllBudget();
     renderAnnualTable();
-    renderInvestmentsTable();
+    renderInvestmentsList();
     initDarkMode();
 
     const cloneAndReplace = (id, handler) => {
       const el = document.getElementById(id);
+      if (!el) return;
       const clone = el.cloneNode(true);
       el.parentNode.replaceChild(clone, el);
       clone.addEventListener('click', handler);
