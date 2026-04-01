@@ -6,7 +6,7 @@
   <title>Smart Ledger Pro | Budget Tracker</title>
   <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
   <style>
-    /* (All existing styles remain exactly the same as your last working version – omitted for brevity) */
+    /* (All styles unchanged – same as last working version) */
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, 'Segoe UI', 'Inter', -apple-system, BlinkMacSystemFont, 'Roboto', sans-serif; transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease; }
     body { background: #eef3fa; padding: 20px 16px 48px; color: #1a2c3e; }
     body.dark-mode { background: #121826; color: #e2e8f0; }
@@ -84,79 +84,23 @@
     .login-box button { width: 100%; margin-top: 12px; }
     .error-msg { color: #e53e3e; font-size: 0.8rem; margin-top: 8px; }
 
-    /* New styles for investments */
-    .investment-item {
-      margin-bottom: 24px;
-      border: 1px solid #e2edf2;
-      border-radius: 28px;
-      overflow: hidden;
-    }
-    body.dark-mode .investment-item {
-      border-color: #334155;
-    }
-    .investment-header {
-      background: #f8fafc;
-      padding: 12px 20px;
-      cursor: pointer;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-weight: 600;
-    }
-    body.dark-mode .investment-header {
-      background: #0f172a;
-    }
-    .investment-header:hover {
-      background: #f1f5f9;
-    }
-    body.dark-mode .investment-header:hover {
-      background: #1e293b;
-    }
-    .investment-summary {
-      display: flex;
-      gap: 24px;
-      font-size: 0.8rem;
-      color: #2b5d7c;
-    }
-    body.dark-mode .investment-summary {
-      color: #94a3b8;
-    }
-    .investment-details {
-      padding: 16px 20px;
-      border-top: 1px solid #e2edf2;
-    }
-    body.dark-mode .investment-details {
-      border-top-color: #334155;
-    }
-    .transaction-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.75rem;
-      margin-bottom: 16px;
-    }
-    .transaction-table th, .transaction-table td {
-      padding: 8px 6px;
-      text-align: left;
-      border-bottom: 1px solid #e6edf2;
-    }
-    body.dark-mode .transaction-table td {
-      border-bottom-color: #334155;
-    }
-    .add-transaction {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      margin-top: 12px;
-      padding-top: 12px;
-      border-top: 1px solid #e2edf2;
-    }
-    body.dark-mode .add-transaction {
-      border-top-color: #334155;
-    }
-    .small-input {
-      width: 140px;
-    }
+    /* Investment styles (unchanged) */
+    .investment-item { margin-bottom: 24px; border: 1px solid #e2edf2; border-radius: 28px; overflow: hidden; }
+    body.dark-mode .investment-item { border-color: #334155; }
+    .investment-header { background: #f8fafc; padding: 12px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-weight: 600; }
+    body.dark-mode .investment-header { background: #0f172a; }
+    .investment-header:hover { background: #f1f5f9; }
+    body.dark-mode .investment-header:hover { background: #1e293b; }
+    .investment-summary { display: flex; gap: 24px; font-size: 0.8rem; color: #2b5d7c; }
+    body.dark-mode .investment-summary { color: #94a3b8; }
+    .investment-details { padding: 16px 20px; border-top: 1px solid #e2edf2; }
+    body.dark-mode .investment-details { border-top-color: #334155; }
+    .transaction-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; margin-bottom: 16px; }
+    .transaction-table th, .transaction-table td { padding: 8px 6px; text-align: left; border-bottom: 1px solid #e6edf2; }
+    body.dark-mode .transaction-table td { border-bottom-color: #334155; }
+    .add-transaction { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2edf2; }
+    body.dark-mode .add-transaction { border-top-color: #334155; }
+    .small-input { width: 140px; }
   </style>
 </head>
 <body>
@@ -191,7 +135,7 @@
     </div>
 
     <div id="budgetTab" class="tab-content active">
-      <!-- (Your existing budget tab HTML remains exactly the same – omitted for brevity) -->
+      <!-- (Budget tab content remains exactly the same as in the last working version – omitted for brevity) -->
       <div id="internetReminder" class="reminder-card" style="display: none;"></div>
       <div class="dashboard">
         <div class="card-summary"><h3>📆 This Year Savings</h3><div class="amount" id="yearlySavings">₱0</div></div>
@@ -253,16 +197,16 @@
       </div>
       <div class="table-wrapper">
         <table class="entries-table">
-          <thead>   <tr><th>Date</th><th>Gross Income</th><th>Dockages</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th>   </thead>
+          <thead>    <th>Date</th><th>Gross Income</th><th>Dockages</th><th>Net Pay</th><th>Amortization</th><th>MP2</th><th>Savings</th><th>Tights (10%)</th><th>Net Surplus</th><th>Actions</th>   </thead>
           <tbody id="entriesBody">   <td colspan="10">No records. Add a manual entry or import Excel.   </tbody>
           <tfoot id="entriesFoot"></tfoot>
-        </table>
+         </table>
       </div>
     </div>
 
-    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead>   <th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th>   </thead><tbody id="annualBody"></tbody></table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
+    <div id="annualTab" class="tab-content"><div class="panel"><div class="section-title">📅 Annual Income Summary</div><div class="table-wrapper"><table class="annual-table"><thead>   <th>Year</th><th>Gross Compensation Income</th><th>Non-Taxable Income</th><th>Taxable Income</th><th>Tax Due</th><th>Net Income</th><th>Monthly Net Average</th><th>Actions</th>   </thead><tbody id="annualBody"></tbody> </table></div><div class="action-buttons"><button id="addYearBtn" class="secondary">➕ Add New Year</button></div></div></div>
 
-    <!-- INVESTMENTS TAB – NEW DESIGN -->
+    <!-- INVESTMENTS TAB (unchanged – includes the goat farm demo) -->
     <div id="investmentsTab" class="tab-content">
       <div class="dashboard" id="investmentsDashboard">
         <div class="card-summary"><h3>💰 Total Invested</h3><div class="amount" id="totalInvested">₱0</div></div>
@@ -270,7 +214,6 @@
         <div class="card-summary"><h3>🔧 Total Maintenance</h3><div class="amount" id="totalMaintenance">₱0</div></div>
         <div class="card-summary"><h3>📊 Net ROI</h3><div class="amount" id="totalNetROI">₱0</div></div>
       </div>
-
       <div class="panel">
         <div style="display: flex; justify-content: space-between;">
           <h3>📈 Add / Edit Investment</h3>
@@ -286,7 +229,6 @@
           <button id="submitInvBtn" class="primary">➕ Add Investment</button>
         </div>
       </div>
-
       <div id="investmentsList"></div>
     </div>
 
@@ -306,7 +248,55 @@
 </div>
 
 <script>
-  // ==================== LOGIN & PASSWORD (unchanged) ====================
+  // ==================== SESSION TIMEOUT ====================
+  let inactivityTimer;
+  const SESSION_KEY = 'app_authenticated';
+
+  function startInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      logout();
+    }, 15 * 60 * 1000); // 15 minutes
+  }
+
+  function resetInactivityTimer() {
+    // Only reset if the app is visible (logged in)
+    if (document.getElementById('appContent').style.display !== 'none') {
+      clearTimeout(inactivityTimer);
+      startInactivityTimer();
+    }
+  }
+
+  function logout() {
+    // Clear session storage
+    sessionStorage.removeItem(SESSION_KEY);
+    // Hide app content and show login overlay
+    document.getElementById('appContent').style.display = 'none';
+    document.getElementById('loginOverlay').style.display = 'flex';
+    document.getElementById('passwordInput').value = '';
+    document.getElementById('loginError').innerText = '';
+    // Clear any existing timers
+    clearTimeout(inactivityTimer);
+    // Remove activity listeners to prevent further resets (they will be re-attached on next login)
+    removeActivityListeners();
+  }
+
+  // Activity event listeners
+  function attachActivityListeners() {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      window.addEventListener(event, resetInactivityTimer);
+    });
+  }
+
+  function removeActivityListeners() {
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart'];
+    events.forEach(event => {
+      window.removeEventListener(event, resetInactivityTimer);
+    });
+  }
+
+  // ==================== LOGIN & PASSWORD ====================
   const STORED_HASH_KEY = 'app_password_hash';
   const DEFAULT_PASSWORD = 'budget123';
 
@@ -324,48 +314,67 @@
     return (await hashPassword(pwd)) === storedHash;
   }
 
-  document.getElementById('loginOverlay').style.display = 'flex';
+  // Check if already authenticated in this session
+  if (sessionStorage.getItem(SESSION_KEY) === 'true') {
+    document.getElementById('loginOverlay').style.display = 'none';
+    document.getElementById('appContent').style.display = 'block';
+    initApp();
+    attachActivityListeners();
+    startInactivityTimer();
+  } else {
+    document.getElementById('loginOverlay').style.display = 'flex';
+  }
+
   document.getElementById('loginBtn').addEventListener('click', async () => {
     const pwd = document.getElementById('passwordInput').value;
-    if (await verifyPassword(pwd)) {
+    const isValid = await verifyPassword(pwd);
+    if (isValid) {
+      sessionStorage.setItem(SESSION_KEY, 'true');
       document.getElementById('loginOverlay').style.display = 'none';
       document.getElementById('appContent').style.display = 'block';
       initApp();
-    } else document.getElementById('loginError').innerText = 'Incorrect password.';
+      attachActivityListeners();
+      startInactivityTimer();
+    } else {
+      document.getElementById('loginError').innerText = 'Incorrect password.';
+    }
   });
   document.getElementById('passwordInput').addEventListener('keypress', e => { if (e.key === 'Enter') document.getElementById('loginBtn').click(); });
 
+  // Settings modal
   const settingsModal = document.getElementById('settingsModal');
-  document.getElementById('settingsBtn').addEventListener('click', () => settingsModal.style.display = 'flex');
-  document.getElementById('closeSettingsBtn').addEventListener('click', () => settingsModal.style.display = 'none');
+  document.getElementById('settingsBtn').addEventListener('click', () => { settingsModal.style.display = 'flex'; });
+  document.getElementById('closeSettingsBtn').addEventListener('click', () => { settingsModal.style.display = 'none'; });
   document.getElementById('savePasswordBtn').addEventListener('click', async () => {
     const oldPwd = document.getElementById('oldPassword').value;
     const newPwd = document.getElementById('newPassword').value;
     const confirmPwd = document.getElementById('confirmPassword').value;
     const errorSpan = document.getElementById('passwordError');
     if (!oldPwd || !newPwd || !confirmPwd) { errorSpan.innerText = 'All fields are required.'; return; }
-    if (!(await verifyPassword(oldPwd))) { errorSpan.innerText = 'Current password is incorrect.'; return; }
+    const isOldValid = await verifyPassword(oldPwd);
+    if (!isOldValid) { errorSpan.innerText = 'Current password is incorrect.'; return; }
     if (newPwd !== confirmPwd) { errorSpan.innerText = 'New passwords do not match.'; return; }
     if (newPwd.length < 4) { errorSpan.innerText = 'Password must be at least 4 characters.'; return; }
     await setPassword(newPwd);
-    alert('Password changed. Please log in again.');
+    alert('Password changed successfully. You will need to log in again next session.');
     settingsModal.style.display = 'none';
-    document.getElementById('oldPassword').value = document.getElementById('newPassword').value = document.getElementById('confirmPassword').value = '';
+    document.getElementById('oldPassword').value = '';
+    document.getElementById('newPassword').value = '';
+    document.getElementById('confirmPassword').value = '';
     errorSpan.innerText = '';
-    document.getElementById('loginOverlay').style.display = 'flex';
-    document.getElementById('appContent').style.display = 'none';
+    // Force re-login
+    logout();
   });
 
-  // ==================== APP CORE (Budget & Annual – unchanged from last working version) ====================
+  // ==================== APP CORE (Budget & Annual – unchanged) ====================
   let fixedIncome = { basic: 37260, laundry: 150, clothing: 250, communication: 500, meal: 1100, rice: 1000 };
   let entries = [], annualData = [];
 
-  // Helper to compute default savings based on basic pay (rounded to nearest hundred)
   function getDefaultSavings(basic = fixedIncome.basic) {
     return Math.round((basic * 0.15) / 100) * 100;
   }
 
-  // ---------- ANNUAL (unchanged) ----------
+  // ---------- ANNUAL ----------
   function loadAnnualData() {
     const stored = localStorage.getItem('annualIncomeData_v15');
     if (stored) annualData = JSON.parse(stored);
@@ -407,7 +416,7 @@
   }
   function addNewYear() { const maxYear = Math.max(...annualData.map(r=>r.year),2025); annualData.push({ year: maxYear+1, grossComp:0, nonTaxable:0, taxable:0, taxDue:0, netIncome:0, monthlyNetAvg:0 }); saveAnnualData(); renderAnnualTable(); }
 
-  // ---------- BUDGET (unchanged – all functions from last working version) ----------
+  // ---------- BUDGET ----------
   function loadFixedSettings() {
     const stored = localStorage.getItem('smartLedgerPro_fixedIncome_v17');
     if (stored) fixedIncome = { ...fixedIncome, ...JSON.parse(stored) };
@@ -479,6 +488,7 @@
     document.getElementById('totalTights').innerHTML = '₱'+getTotalTights().toLocaleString(2);
   }
 
+  let currentYearFilter = 'all';
   function updateYearFilterOptions() {
     const years = [...new Set(entries.map(e => new Date(e.date).getFullYear()))].sort((a,b)=>b-a);
     const select = document.getElementById('yearFilterSelect');
@@ -487,7 +497,6 @@
     select.value = currentYearFilter;
   }
 
-  let currentYearFilter = 'all';
   function renderTotalRow(filteredEntries) {
     if (!filteredEntries.length) { document.getElementById('entriesFoot').innerHTML = ''; return; }
     const totals = { gross:0, dockages:0, netPay:0, amort:0, mp2:0, savings:0, tights:0, surplus:0 };
@@ -501,7 +510,7 @@
       totals.tights += computeEntryTights(e);
       totals.surplus += computeEntryFinal(e);
     });
-    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">      <td><strong>TOTAL</strong></td>      <td>₱${totals.gross.toLocaleString(2)}</td>      <td>₱${totals.dockages.toLocaleString(2)}</td>      <td>₱${totals.netPay.toLocaleString(2)}</td>      <td>₱${totals.amort.toLocaleString(2)}</td>      <td>₱${totals.mp2.toLocaleString(2)}</td>      <td>₱${totals.savings.toLocaleString(2)}</td>      <td>₱${totals.tights.toLocaleString(2)}</td>      <td>₱${totals.surplus.toLocaleString(2)}</td>      <td></td>    </tr>`;
+    const footRow = `<tr style="background: #f1f5f9; font-weight: 700;">       <td><strong>TOTAL</strong></td>       <td>₱${totals.gross.toLocaleString(2)}</td>       <td>₱${totals.dockages.toLocaleString(2)}</td>       <td>₱${totals.netPay.toLocaleString(2)}</td>       <td>₱${totals.amort.toLocaleString(2)}</td>       <td>₱${totals.mp2.toLocaleString(2)}</td>       <td>₱${totals.savings.toLocaleString(2)}</td>       <td>₱${totals.tights.toLocaleString(2)}</td>       <td>₱${totals.surplus.toLocaleString(2)}</td>       <td></td>     </tr>`;
     document.getElementById('entriesFoot').innerHTML = footRow;
   }
 
@@ -614,7 +623,7 @@
   }
   function resetAllData() { if(confirm('Delete ALL pay periods?')){ entries=[]; saveEntries(); updateYearFilterOptions(); renderEntriesTable(); clearForm(); } }
 
-  // ---------- EXCEL IMPORT (unchanged) ----------
+  // ---------- EXCEL IMPORT ----------
   async function parseExcelToEntries(file) {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -691,7 +700,7 @@
     input.click();
   }
 
-  // ---------- INVESTMENTS (NEW) ----------
+  // ---------- INVESTMENTS ----------
   let investments = [];
 
   function loadInvestments() {
@@ -774,14 +783,13 @@
             <button class="add-transaction-btn" data-id="${inv.id}">➕ Add Transaction</button>
           </div>
           <table class="transaction-table">
-            <thead><tr><th>Date</th><th>Description</th><th>Amount</th><th>Category</th><th>Actions</th></tr></thead>
+            <thead> <tr><th>Date</th><th>Description</th><th>Amount</th><th>Category</th><th>Actions</th></tr> </thead>
             <tbody id="transactions-${inv.id}"></tbody>
           </table>
         </div>
       `;
       container.appendChild(div);
 
-      // Fill transactions table
       const tbody = div.querySelector(`#transactions-${inv.id}`);
       inv.transactions.forEach(t => {
         const row = tbody.insertRow();
@@ -793,7 +801,6 @@
         actionCell.innerHTML = `<button class="edit-transaction-btn" data-inv="${inv.id}" data-tid="${t.id}">✏️</button> <button class="delete-transaction-btn" data-inv="${inv.id}" data-tid="${t.id}">🗑️</button>`;
       });
 
-      // Attach event listeners
       const header = div.querySelector('.investment-header');
       const details = div.querySelector('.investment-details');
       header.addEventListener('click', (e) => {
